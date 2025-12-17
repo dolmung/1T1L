@@ -76,7 +76,10 @@ def room_to_dict(doc_snapshot):
     return data
 
 # Serve static files (HTML, JS, CSS)
-app.mount("/static", StaticFiles(directory="static", html=True))
+if os.path.exists("static"):
+    app.mount("/static", StaticFiles(directory="static", html=True))
+else:
+    print("WARNING: static directory not found. Static files disabled.")
 
 @app.get("/debug/dump")
 def debug_dump():
