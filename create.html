@@ -755,54 +755,7 @@
             setTimeout(() => isFlipping = false, 600);
         }
 
-        // 3D Tilt Effect
-        document.addEventListener('mousemove', function (e) {
-            if (isFlipping) return;
 
-            const card = document.getElementById('hostCard');
-            if (!card) return;
-            const scene = document.getElementById('hostScene');
-            if (!scene.contains(e.target) && e.target !== scene) {
-                card.style.setProperty('--rx', '0deg');
-                card.style.setProperty('--ry', '0deg');
-                return;
-            }
-
-            // Disable tilt on button hover
-            if (e.target.closest('.card-flip-btn')) {
-                card.style.setProperty('--rx', '0deg');
-                card.style.setProperty('--ry', '0deg');
-                return;
-            }
-
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-
-            const rotateX = ((y - centerY) / centerY) * -25; // Max 25deg
-            const rotateY = ((x - centerX) / centerX) * 25;
-
-            card.style.setProperty('--rx', `${rotateX}deg`);
-            card.style.setProperty('--ry', `${rotateY}deg`);
-
-            const bgX = 50 + ((x / rect.width) - 0.5) * 200; // Move gradient
-            const bgY = 50 + ((y / rect.height) - 0.5) * 200;
-
-            card.style.setProperty('--bg-x', `${bgX}%`);
-            card.style.setProperty('--bg-y', `${bgY}%`);
-        });
-
-        // Reset on leave
-        document.addEventListener('mouseout', function (e) {
-            const card = document.getElementById('hostCard');
-            if (card) {
-                card.style.setProperty('--rx', '0deg');
-                card.style.setProperty('--ry', '0deg');
-            }
-        });
 
         function adjustHostCardSize(img) {
             const scene = document.getElementById('hostScene');
@@ -834,8 +787,27 @@
 
         function handleInput() {
             const ta = document.getElementById('TextInput');
+
+            // Cursor preservation
+            const start = ta.selectionStart;
+            const end = ta.selectionEnd;
+
             // Allow newlines again
-            ta.value = ta.value.toUpperCase().replace(/[^A-Z0-9\n ]/g, "");
+            const original = ta.value;
+            const upper = original.toUpperCase();
+            const filtered = upper.replace(/[^A-Z0-9\n ]/g, "");
+
+            if (original !== filtered) {
+                ta.value = filtered;
+                // Restore cursor (approximate)
+                ta.setSelectionRange(start, end);
+            }
+            // If only case change, just update
+            else if (original !== upper) {
+                ta.value = upper;
+                ta.setSelectionRange(start, end);
+            }
+
             updatePreview(ta.value, false);
         }
 
