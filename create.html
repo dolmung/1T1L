@@ -741,6 +741,14 @@
                 let w = maxWidth;
                 let h = w / ratio;
                 if (h < 300) h = 300;
+
+                // Add Max Height Constraint (e.g. 60vh)
+                const maxH = window.innerHeight * 0.6;
+                if (h > maxH) {
+                    h = maxH;
+                    w = h * ratio;
+                }
+
                 scene.style.width = w + "px";
                 scene.style.height = h + "px";
             }
@@ -1012,13 +1020,20 @@
             let filled = 0, system = 0, noName = 0;
 
             // Sort by creation or key? Key is safe.
+            // Sort by creation or key? Key is safe.
             Object.values(slots).forEach(slot => {
-                if (slot.is_filled) filled++;
-                if (slot.reserved_by === 'SYSTEM') system++;
-                if (slot.is_filled && !slot.reserved_by) noName++;
+                // Loosen check: filled OR has strokes
+                const hasContent = slot.is_filled || (slot.strokes && slot.strokes.length > 0);
 
-                if (!slot.is_filled || !slot.reserved_by) return;
-                if (slot.reserved_by === 'SYSTEM') return; // Hide auto-filled slots
+                if (hasContent) filled++;
+                if (slot.reserved_by === 'SYSTEM') system++;
+
+                // Ignore empty or system slots
+                if (!hasContent) return;
+                if (slot.reserved_by === 'SYSTEM') return;
+
+                if (!slot.reserved_by) noName++;
+
                 count++;
 
                 const item = document.createElement('div');
