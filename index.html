@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONE TYPE ONE LETTER - Friend</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            color: #000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Screen Management */
+        .screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.3s;
+            padding: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Setup Screen */
+        .input-group {
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        button.btn-main {
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 16px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        /* Workspace & Card */
+        .scene {
+            width: 340px;
+            height: 340px;
+            position: relative;
+            perspective: 1000px;
+            margin: 0 auto;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            border: 1px solid #000;
+            transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+        }
+
+        .card.is-flipped {
+            transform: rotateX(var(--rx, 0deg)) rotateY(calc(180deg + var(--ry, 0deg)));
+        }
+
+        #finalCard {
+            border: none;
+        }
+
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background: white;
+            overflow: hidden;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            z-index: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            background: #A14343;
+            color: #fff;
+        }
+
+        .card-front {
+            z-index: 2;
+        }
+
+        .card-flip-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            /* Changed from circle icon to text button */
+            width: auto;
+            height: auto;
+            padding: 5px 12px;
+            background: #fff;
+            border: 1px solid #000;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 100;
+            transition: 0.2s;
+        }
+
+        .card-flip-btn:hover {
+            background: #000;
+            color: #fff;
+            /* Removed rotation since it's text now */
+        }
+
+        #host-message-display {
+            color: #000 !important;
+        }
+
+        .top-guide {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 900;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .canvas-area {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            /* White paper */
+        }
+
+        .guide-char {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 280px;
+            font-weight: 900;
+            color: rgba(0, 0, 0, 0.05);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            touch-action: none;
+            /* Essential for touch drawing */
+        }
+
+        /* Tools */
+        .tools-container {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .tool-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .shape-btn,
+        .color-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 22px;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            background: #fff;
+            transition: all 0.2s;
+        }
+
+        .shape-btn.active,
+        .color-btn.active {
+            border-color: #000;
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .eraser-btn {
+            width: auto;
+            padding: 0 15px;
+            border-radius: 22px;
+            font-size: 14px;
+            font-weight: bold;
+            white-space: nowrap;
+            /* Prevent line break */
+        }
+
+        .trash-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: transparent;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        /* Back face inputs */
+        textarea {
+            flex: 1;
+            margin-top: 20px;
+            width: 100%;
+            border: 1px solid #eee;
+            background: #fafafa;
+            padding: 15px;
+            resize: none;
+            font-family: inherit;
+            outline: none;
+        }
+
+        /* OK Button next to colors */
+        .btn-send {
+            width: 60px;
+            height: 44px;
+            background: #000;
+            color: #fff;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            cursor: pointer;
+            margin-left: auto;
+        }
+    </style>
+</head>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
+
+<body>
+
+    <!-- 1. SETUP SCREEN -->
+    <div id="setup-screen" class="screen">
+        <div style="width:100%; max-width:340px; display:flex; flex-direction:column; align-items:flex-start;">
+            <div style="margin-bottom:40px;">
+                <h1 style="font-size:50px; line-height:0.9; font-weight:900; margin:0; text-transform:uppercase;">ONE
+                    TYPE<br>ONE LETTER</h1>
+                <span style="font-size:12px; color:#666; display:inline-block; margin-top:10px;">ONLINE Rolling
+                    Paper</span>
+                <div id="room-host-display" style="font-size:18px; color:#A14343; margin-top:5px; font-weight:bold;">
+                    Loading...</div>
+            </div>
+
+            <div class="input-group">
+                <label>YOUR NAME</label>
+                <input type="text" id="userName" placeholder="이름을 입력하세요">
+            </div>
+            <button id="startBtn" class="btn-main" onclick="checkStart()">START</button>
+        </div>
+        <div id="debug-box" style="margin-top:20px; font-size:10px; color:red; display:none;"></div>
+    </div>
+
+
+    <!-- 2. WAITING SCREEN -->
+    <div id="waiting-screen" class="screen hidden" style="text-align:center;">
+        <h2 style="font-size:24px;">OPENS AT</h2>
+        <h1 id="open-time-display" style="font-size:48px; font-weight:900; margin:10px 0;">00:00 OPEN</h1>
+        <p style="color:#666;">호스트가 카드를 완성할 때까지<br>조금만 기다려주세요!</p>
+    </div>
+
+
+    <!-- 3. FINAL SCREEN -->
+    <div id="final-screen" class="screen hidden" style="overflow-y:auto;">
+        <div class="scene" id="finalScene" style="height:auto; min-height:300px; margin-bottom:30px;">
+            <div class="card-flip-btn" onclick="flipFinalCard()">뒤집기</div>
+            <div class="card" id="finalCard" onclick="flipFinalCard()">
+                <div class="card-face card-front" style="background:#A14343;">
+                    <img id="final-card-img" style="width:100%; height:100%; object-fit:contain;" src="">
+                </div>
+                <div class="card-face card-back">
+                    <h3 id="final-host-back-name" style="margin-top:0;">From. Host</h3>
+                    <div id="host-message-display"
+                        style="white-space:pre-wrap; text-align:left; background:#fafafa; padding:15px; flex:1; overflow-y:auto;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            style="text-align:center; width:100%; max-width:300px; z-index:100; display:flex; flex-direction:column; gap: 10px;">
+            <button class="btn-main" style="margin:0; background:#fff; color:#000; border:1px solid #000;"
+                onclick="downloadResult()">이미지 저장</button>
+            <button class="btn-main" style="margin:0; background:#fff; color:#000; border:1px solid #000;"
+                onclick="copyLink()">링크 복사</button>
+            <button class="btn-main" style="margin:0; background:#FEE500; color:#000; border:none;"
+                onclick="shareKakao()">카톡 공유</button>
+        </div>
+        <div style="margin-top:10px; color:#666; font-size:13px;">카드를 클릭해서 뒤집어보세요</div>
+    </div>
+
+    <!-- PADDING ADDED HERE -->
+    <div id="workspace" style="display:none; width:100%; flex-direction:column; align-items:center; padding-top:60px;">
+        <div class="top-guide" id="guideText">글자를 예쁘게 꾸며주세요!</div>
+
+        <div class="scene">
+            <!-- Flip Button attached to scene -->
+            <div class="card-flip-btn" onclick="flipCard()">뒤집기</div>
+
+            <div class="card" id="mainCard">
+                <div class="card-face card-front">
+                    <div class="canvas-area" id="canvasContainer">
+                        <div class="guide-char" id="targetChar">?</div>
+                        <canvas id="drawingCanvas"></canvas>
+                    </div>
+                </div>
+                <div class="card-face card-back">
+                    <h2 style="text-transform:uppercase;">To. <span id="to-host-name">Host</span></h2>
+                    <textarea id="letterMsg" placeholder="친구에게 보낼 한마디를 적어주세요..."></textarea>
+                    <div style="font-size:13px; color:#999; text-align:right;">From. <span id="display-name"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tools moved outside card -->
+        <div class="tools-container">
+            <div class="tool-row">
+                <!-- Shapes -->
+                <div class="shape-btn active" onclick="setBrushType('line', this)" title="선">
+                    <div style="width:6px; height:6px; background:#000; border-radius:50%;"></div>
+                </div>
+                <div class="shape-btn" onclick="setBrushType('heart', this)" title="하트">♥</div>
+                <div class="shape-btn" onclick="setBrushType('v-stitch', this)" title="스티치">∨</div>
+                <div class="shape-btn eraser-btn" onclick="setEraser(this)">지우개</div>
+
+                <!-- Thickness Slider -->
+                <div style="display:flex; align-items:center; gap:5px; flex:1; margin-left:10px;">
+                    <span style="font-size:10px; font-weight:bold;">두께</span>
+                    <input type="range" id="thicknessSlider" min="1" max="30" value="5"
+                        style="width:100%; accent-color:#000;" oninput="setBrushSize(this.value)">
+                </div>
+
+                <button class="trash-btn" onclick="clearAll()">🗑️</button>
+            </div>
+            <div class="tool-row">
+                <div class="color-btn active" style="background:#A14343" onclick="setColor('#A14343', this)"></div>
+                <div class="color-btn" style="background:#2e7d32" onclick="setColor('#2e7d32', this)"></div>
+                <div class="color-btn" style="background:#fdd835" onclick="setColor('#fdd835', this)"></div>
+                <div class="color-btn" style="background:#000000" onclick="setColor('#000000', this)"></div>
+                <div class="color-btn" style="background:#ffffff; border:1px solid #ccc;"
+                    onclick="setColor('#ffffff', this)"></div>
+
+                <!-- Integrated OK Button -->
+                <div class="btn-send" onclick="submitCard()">전송</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const FABRIC_DOT_COLOR = "#e0e0e0";
+        const BG_COLOR = "#ffffff";
+
+        let myName = ""; let isFlipped = false; let canvas, ctx;
+        let isDrawing = false;
+
+        // Brush State
+        let currentBrushType = 'line'; // line, heart, v-stitch
+        let currentBrushSize = 5;
+        let currentBrushColor = "#000000";
+        let isEraser = false;
+        let points = [];
+        let drawingStrokes = []; // History {type, color, width, points}
+        let currentStroke = null;
+        let currentColor = "#A14343";
+        let currentWidth = 5;
+        let currentType = "line"; // line, heart, v-stitch
+        let isEraserMode = false;
+
+        let animationFrameId;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get('room');
+
+        window.onload = function () {
+            if (roomId) fetchRoomInfo();
+        };
+
+        async function fetchRoomInfo() {
+            try {
+                // Prevent caching
+                const res = await fetch(`/status/${roomId}?t=${new Date().getTime()}`);
+                const data = await res.json();
+                if (!data.error) {
+                    document.getElementById('room-host-display').innerText = `${data.host_name}'s ROOM`;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        if (!roomId) { alert("방 ID가 없습니다"); document.body.innerHTML = "<h1>잘못된 접근입니다</h1>"; }
+
+        async function checkStart() {
+            const nameInput = document.getElementById('userName');
+            if (!nameInput.value.trim()) return alert("이름을 입력해주세요");
+            myName = nameInput.value;
+            try {
+                const res = await fetch(`/status/${roomId}`);
+                const status = await res.json();
+                if (status.error) return alert("방을 찾을 수 없습니다");
+
+                document.getElementById('to-host-name').innerText = status.host_name || "Host";
+
+                // Disable button to prevent double click
+                const btn = document.getElementById('startBtn');
+                if (btn) btn.disabled = true;
+
+                if (status.is_open) {
+                    const img = document.querySelector('#final-card-img');
+                    img.src = `/result_card/${roomId}`;
+                    img.onerror = function () {
+                        this.style.display = 'none';
+                        document.getElementById('no-image-msg').style.display = 'block';
+                    };
+
+                    // Update Host Name on back of card
+                    const hostNameEl = document.getElementById('final-host-back-name');
+                    if (hostNameEl) hostNameEl.innerText = `From. ${status.host_name || 'Host'}`;
+
+                    const hMsg = (status.host_message || "").trim();
+                    document.getElementById('host-message-display').innerText = hMsg || "호스트의 메시지가 없습니다.";
+                    showScreen('final-screen');
+                    return;
+                }
+                const reserveRes = await fetch(`/reserve/${roomId}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_name: myName, message: "" })
+                });
+                const reserveData = await reserveRes.json();
+
+                if (reserveData.status === "TIME_OVER") {
+                    showTimeOverModal(reserveData.message || "시간이 종료되었습니다.");
+                    if (btn) btn.disabled = false;
+                    return;
+                }
+
+                if (reserveData.status === "SUCCESS") {
+                    // Success (either text or special char)
+                    startDecorating(reserveData.assigned_char);
+                } else {
+                    // Fallback for unexpected error
+                    alert(reserveData.message || "방 입장에 실패했습니다.");
+                    if (btn) btn.disabled = false;
+                    showWaiting(status.open_time);
+                }
+            } catch (e) {
+                alert("서버 오류");
+                const btn = document.getElementById('startBtn');
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        function startDecorating(char) {
+            const ws = document.getElementById('workspace');
+            ws.style.display = 'flex';
+            showScreen('workspace');
+            document.getElementById('targetChar').innerText = char;
+            document.getElementById('display-name').innerText = myName;
+            setTimeout(initCanvas, 100);
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(el => el.classList.add('hidden'));
+            const ws = document.getElementById('workspace');
+            if (id === 'workspace') { } else { ws.style.display = 'none'; }
+            const target = document.getElementById(id);
+            if (target && id !== 'workspace') target.classList.remove('hidden');
+        }
+        function showWaiting(timeStr) {
+            showScreen('waiting-screen');
+            const dateObj = new Date(timeStr);
+            const datePart = dateObj.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
+            const timePart = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('open-time-display').innerHTML = `<div style="font-size:16px; margin-bottom:5px;">${datePart}</div>${timePart} OPEN`;
+        }
+        function flipCard() {
+            isFlipped = !isFlipped;
+            const card = document.getElementById('mainCard');
+            const guide = document.getElementById('guideText');
+            stopDrawing();
+            if (isFlipped) { card.classList.add('is-flipped'); guide.innerText = "메시지를 작성하세요"; }
+            else { card.classList.remove('is-flipped'); guide.innerText = "브러쉬로 꾸며주세요!"; }
+        }
+
+        let isFlipping = false;
+        function flipFinalCard() {
+            if (isFlipping) return;
+            isFlipping = true;
+            document.getElementById('finalCard').classList.toggle('is-flipped');
+            setTimeout(() => isFlipping = false, 600);
+        }
+
+        function adjustCardSize(img) {
+            img.style.display = 'block';
+            const scene = document.getElementById('finalScene');
+            const maxWidth = Math.min(window.innerWidth - 40, 600);
+            const ratio = img.naturalWidth / img.naturalHeight;
+            let newWidth = maxWidth;
+            let newHeight = newWidth / ratio;
+            if (newHeight < 250) { newHeight = 250; }
+            scene.style.width = newWidth + 'px';
+            scene.style.height = newHeight + 'px';
+        }
+
+        // --- DRAWING LOGIC ---
+        function initCanvas() {
+            canvas = document.getElementById('drawingCanvas');
+            ctx = canvas.getContext('2d');
+            const container = document.getElementById('canvasContainer');
+            canvas.width = container.offsetWidth; canvas.height = container.offsetHeight;
+            drawLoop();
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e.touches[0]); });
+            canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
+            canvas.addEventListener('touchend', (e) => { e.preventDefault(); stopDrawing(); });
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+        }
+
+        function startDrawing(e) {
+            if (isFlipped) return;
+            isDrawing = true;
+            const pos = getPos(e);
+
+            if (isEraserMode) {
+                currentStroke = {
+                    type: 'line',
+                    color: BG_COLOR,
+                    width: currentWidth * 2,
+                    points: [pos]
+                };
+            } else {
+                currentStroke = {
+                    type: currentType,
+                    color: currentColor,
+                    width: currentWidth,
+                    points: [pos]
+                };
+            }
+            drawingStrokes.push(currentStroke);
+        }
+
+        function draw(e) {
+            if (!isDrawing || !currentStroke) return;
+            const pos = getPos(e);
+            currentStroke.points.push(pos);
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            currentStroke = null;
+        }
+
+        function drawLoop() {
+            renderCanvas(true);
+            animationFrameId = setTimeout(() => requestAnimationFrame(drawLoop), 100);
+        }
+
+        function renderCanvas(jitter = false) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Fabric dots REMOVED
+            /*
+            ctx.fillStyle = FABRIC_DOT_COLOR;
+            for (let y = 10; y < canvas.height; y += 20) {
+                for (let x = 10; x < canvas.width; x += 20) {
+                    ctx.beginPath(); ctx.arc(x, y, 1.5, 0, Math.PI * 2); ctx.fill();
+                }
+            }
+            */
+
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            drawingStrokes.forEach(stroke => {
+                if (stroke.points.length < 1) return;
+
+                // Eraser Logic
+                if (stroke.color === BG_COLOR) {
+                    ctx.globalCompositeOperation = 'destination-out';
+                    ctx.strokeStyle = "rgba(0,0,0,1)"; // Color doesn't matter for dest-out, usually
+                    ctx.fillStyle = "rgba(0,0,0,1)";
+                } else {
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.strokeStyle = stroke.color;
+                    ctx.fillStyle = stroke.color;
+                }
+
+                // Jitter points
+                let renderPoints = stroke.points;
+                if (jitter) {
+                    renderPoints = stroke.points.map(p => ({
+                        x: p.x + (Math.random() - 0.5) * 3,
+                        y: p.y + (Math.random() - 0.5) * 3
+                    }));
+                }
+
+                if (stroke.type === 'line') {
+                    if (renderPoints.length < 2) {
+                        // Dot
+                        ctx.beginPath();
+                        ctx.arc(renderPoints[0].x, renderPoints[0].y, stroke.width / 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        ctx.beginPath();
+                        ctx.lineWidth = stroke.width;
+                        ctx.moveTo(renderPoints[0].x, renderPoints[0].y);
+                        for (let i = 1; i < renderPoints.length; i++) ctx.lineTo(renderPoints[i].x, renderPoints[i].y);
+                        ctx.stroke();
+                    }
+                }
+                else if (stroke.type === 'heart') {
+                    // Draw hearts text along path
+                    ctx.font = `${stroke.width * 1.5}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const interval = 3;
+                    for (let i = 0; i < renderPoints.length; i += interval) {
+                        ctx.fillText("♥", renderPoints[i].x, renderPoints[i].y);
+                    }
+                }
+                else if (stroke.type === 'v-stitch') {
+                    // Draw V
+                    ctx.lineWidth = stroke.width / 3;
+                    ctx.beginPath();
+                    for (let i = 0; i < renderPoints.length; i += 3) {
+                        let x = renderPoints[i].x, y = renderPoints[i].y;
+                        let s = stroke.width;
+                        ctx.moveTo(x - s / 2, y - s / 2);
+                        ctx.lineTo(x, y + s / 2);
+                        ctx.lineTo(x + s / 2, y - s / 2);
+                    }
+                    ctx.stroke();
+                }
+            });
+        }
+
+        // --- NEW TOOL LOGIC ---
+        function setBrushType(type, btn) {
+            isEraserMode = false;
+            currentType = type;
+            // Size is now controlled independently by slider, but maybe we want defaults? 
+            // User asked for slider control, so let's stick to slider value.
+            // currentWidth = document.getElementById('thicknessSlider').value; 
+            updateToolUI(btn, null);
+        }
+
+        function setBrushSize(val) {
+            currentWidth = parseInt(val, 10);
+            currentBrushSize = currentWidth; // Sync legacy variable if needed
+        }
+
+        function setColor(color, btn) {
+            currentColor = color;
+            isEraserMode = false;
+            updateToolUI(null, btn);
+        }
+
+        function setEraser(btn) {
+            isEraserMode = true;
+            updateToolUI(btn, null);
+        }
+
+        function updateToolUI(activeShapeBtn, activeColorBtn) {
+            if (activeShapeBtn) {
+                document.querySelectorAll('.shape-btn:not(.eraser-btn)').forEach(b => b.classList.remove('active'));
+                document.querySelector('.eraser-btn').classList.remove('active');
+                activeShapeBtn.classList.add('active');
+            } else if (isEraserMode) {
+                // Keep eraser active
+                document.querySelectorAll('.shape-btn:not(.eraser-btn)').forEach(b => b.classList.remove('active'));
+                document.querySelector('.eraser-btn').classList.add('active');
+            }
+            if (activeColorBtn) {
+                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                activeColorBtn.classList.add('active');
+            }
+        }
+        function clearAll() {
+            if (confirm("정말 다 지우시겠어요?")) drawingStrokes = [];
+        }
+        function downloadResult() {
+            const img = document.querySelector('#final-screen img');
+            if (img && img.src) {
+                const link = document.createElement('a'); link.href = img.src; link.download = `Card_${roomId}.jpg`;
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            }
+        }
+        function copyLink() {
+            const url = window.location.origin + "/?room=" + roomId;
+            navigator.clipboard.writeText(url).then(() => alert("복사 완료!"));
+        }
+        async function submitCard() {
+            try {
+                const msg = document.getElementById('letterMsg').value;
+                if (!msg) return alert("메시지를 작성해주세요!");
+
+                clearTimeout(animationFrameId);
+                renderCanvas(false);
+                const imageData = document.getElementById('drawingCanvas').toDataURL("image/png");
+                drawLoop();
+
+                const res = await fetch(`/join/${roomId}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_name: myName, message: msg,
+                        image_data: imageData,
+                        strokes: drawingStrokes
+                    })
+                });
+                const data = await res.json();
+                if (data.status === 'SUCCESS' || data.status === 'FULL') {
+                    alert("전송 완료!");
+                    const statusRes = await fetch(`/status/${roomId}`);
+                    const s = await statusRes.json();
+                    showWaiting(s.open_time);
+                } else alert("오류: " + (data.message || "알 수 없는 오류"));
+            } catch (e) {
+                console.error("Submit Failed:", e);
+                alert("전송 중 오류가 발생했습니다. (브라우저 설정 문제일 수 있습니다)");
+            }
+        }
+        async function initKakao() {
+            try {
+                const res = await fetch('/api/config');
+                const config = await res.json();
+                if (config.kakao_key) Kakao.init(config.kakao_key);
+            } catch (e) { }
+        }
+        function shareKakao() {
+            if (!Kakao.isInitialized()) return alert("카카오 키 설정 필요");
+            const url = window.location.href;
+            Kakao.Share.sendDefault({
+                objectType: 'feed',
+                content: {
+                    title: 'ONE TYPE ONE LETTER',
+                    description: '친구의 카드를 채워주세요!',
+                    imageUrl: 'https://cdn-icons-png.flaticon.com/512/1077/1077063.png',
+                    link: { mobileWebUrl: url, webUrl: url },
+                },
+                buttons: [{ title: '참여하기', link: { mobileWebUrl: url, webUrl: url } }],
+            });
+        }
+        initKakao();
+        // 3D Tilt Effect for Final Card
+        document.addEventListener('mousemove', function (e) {
+            if (isFlipping) return;
+
+            const card = document.getElementById('finalCard');
+            if (!card || document.getElementById('final-screen').classList.contains('hidden')) return;
+
+            const scene = document.getElementById('finalScene');
+            if (!scene.contains(e.target) && e.target !== scene) {
+                card.style.setProperty('--rx', '0deg');
+                card.style.setProperty('--ry', '0deg');
+                return;
+            }
+
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = ((y - centerY) / centerY) * -25; // Increased to 25deg
+            const rotateY = ((x - centerX) / centerX) * 25;
+
+            card.style.setProperty('--rx', `${rotateX}deg`);
+            card.style.setProperty('--ry', `${rotateY}deg`);
+
+            const bgX = 50 + ((x / rect.width) - 0.5) * 200;
+            const bgY = 50 + ((y / rect.height) - 0.5) * 200;
+
+            card.style.setProperty('--bg-x', `${bgX}%`);
+            card.style.setProperty('--bg-y', `${bgY}%`);
+        });
+
+        document.addEventListener('mouseout', function (e) {
+            const card = document.getElementById('finalCard');
+            if (card) {
+                card.style.setProperty('--rx', '0deg');
+                card.style.setProperty('--ry', '0deg');
+            }
+        });
+
+        function showTimeOverModal(msg) {
+            const div = document.createElement('div');
+            div.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999;";
+            div.innerHTML = `
+                <h2 style='font-size:24px; margin-bottom:20px;'>TIME OVER</h2>
+                <p style='font-size:16px; margin-bottom:30px;'>${msg}</p>
+                <button onclick='location.reload()' style='padding:15px 30px; background:#fff; color:#000; border:none; font-weight:bold; cursor:pointer;'>완성된 카드 보러가기</button>
+            `;
+            document.body.appendChild(div);
+        }
+    </script>
+</body>
+
+</html>

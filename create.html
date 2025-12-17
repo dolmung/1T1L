@@ -1,0 +1,1293 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONE TYPE ONE LETTER</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            margin: 0;
+            padding: 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 80px;
+            font-weight: 900;
+            line-height: 0.9;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-left: 10px;
+            vertical-align: top;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .container {
+            display: flex;
+            gap: 80px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .preview-area {
+            flex: 1;
+        }
+
+        .form-area {
+            width: 400px;
+            flex-shrink: 0;
+        }
+
+        .grid-box {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .row {
+            display: flex;
+            gap: 5px;
+            width: max-content;
+        }
+
+        .slot {
+            width: 50px;
+            /* Default desktop size */
+            height: 50px;
+            font-size: 20px;
+            flex-shrink: 0;
+            background-color: #8D6E63;
+            color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 0px;
+            /* margin: 2px; Removed to fix spacing issue */
+        }
+
+        .slot.filled {
+            background-color: #A14343 !important;
+            color: #fff !important;
+        }
+
+        .slot.empty {
+            background-color: transparent;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        input[type="text"],
+        input[type="datetime-local"],
+        textarea {
+            width: 100%;
+            padding: 15px;
+            background-color: #F5F5F5;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            color: #000;
+            outline: none;
+        }
+
+        textarea {
+            height: 120px;
+            resize: none;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            line-height: 1.5;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #999;
+        }
+
+        .helper-text {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        button.create-btn {
+            width: 100%;
+            padding: 20px;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+
+        button.create-btn:hover {
+            background-color: #333;
+        }
+
+        /* Screen switching */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Dashboard styles */
+        #screen-dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 20px;
+        }
+
+        .dashboard-title {
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+        .status-badge {
+            background: #000;
+            color: #fff;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-left: 10px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+        }
+
+        .panel {
+            background: #fff;
+        }
+
+        .panel h3 {
+            font-size: 18px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-top: 0;
+        }
+
+        .link-box {
+            background: #f5f5f5;
+            padding: 15px;
+            font-family: monospace;
+            word-break: break-all;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .secondary-btn {
+            background: #fff;
+            border: 1px solid #000;
+            color: #000;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            border-radius: 8px;
+        }
+
+        .secondary-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .recent-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #eee;
+            margin-bottom: 5px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .recent-item:hover {
+            background: #f9f9f9;
+            border-color: #ccc;
+        }
+
+        /* 3D Card Scene for Host */
+        .scene {
+            width: 340px;
+            height: 340px;
+            position: relative;
+            perspective: 1000px;
+            margin: 0 auto;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            border: none;
+            transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+        }
+
+        .card.is-flipped {
+            transform: rotateX(var(--rx, 0deg)) rotateY(calc(180deg + var(--ry, 0deg)));
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background: white;
+            overflow: hidden;
+        }
+
+        .card-front {
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            z-index: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            background: #A14343;
+            color: #fff;
+        }
+
+        .card-flip-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            /* Changed from circle icon to text button */
+            width: auto;
+            height: auto;
+            padding: 5px 12px;
+            background: #fff;
+            border: 1px solid #000;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 100;
+            transition: 0.2s;
+        }
+
+        .card-flip-btn:hover {
+            background: #000;
+            color: #fff;
+            /* transform: rotate(180deg); Removed */
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            .preview-area {
+                order: -1;
+                width: 100%;
+            }
+
+            .form-area {
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 40px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .slot {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+                /* Mobile size */
+            }
+
+            .modal-canvas-wrap {
+                width: 90%;
+                height: auto;
+                aspect-ratio: 1/1;
+            }
+
+            #modal-canvas {
+                width: 100% !important;
+                height: 100% !important;
+            }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: #fff;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .modal-content {
+            text-align: center;
+        }
+
+        .modal-canvas-wrap {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 20px;
+            position: relative;
+            border: 1px solid #ccc;
+        }
+
+        .modal-char {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 200px;
+            font-weight: 900;
+            color: rgba(0, 0, 0, 0.05);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
+
+<body>
+
+    <!-- CREATE SCREEN -->
+    <style>
+        /* Header Title Group */
+        .header-title-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        h1 {
+            font-size: 60px;
+            /* Adjust if needed */
+            line-height: 0.9;
+            font-weight: 900;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (min-width: 768px) {
+            .header-title-group {
+                flex-direction: row;
+                align-items: flex-end;
+                gap: 15px;
+            }
+
+            .subtitle {
+                margin-top: 0;
+                margin-bottom: 8px;
+                /* Visual adjustment to align with text baseline */
+            }
+        }
+    </style>
+    <div id="screen-setup" class="screen active">
+        <header>
+            <div class="header-title-group">
+                <h1>ONE TYPE<br>ONE LETTER</h1>
+                <span class="subtitle">ONLINE Rolling Paper</span>
+            </div>
+        </header>
+
+        <div class="container">
+            <div class="preview-area">
+                <div id="preview-grid" class="grid-box">
+                    <div class="row">
+                        <div class="slot">S</div>
+                        <div class="slot">H</div>
+                        <div class="slot">A</div>
+                        <div class="slot">R</div>
+                        <div class="slot">E</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-area">
+                <div class="form-group">
+                    <label>내 이름 (호스트)</label>
+                    <input type="text" id="HostNameInput" placeholder="이름을 입력하세요">
+                </div>
+
+                <div class="form-group">
+                    <label>함께 만들 문구</label>
+                    <textarea id="TextInput" placeholder="SHARE&#10;YOUR&#10;HEART" oninput="handleInput()"></textarea>
+                    <div class="helper-text">* 영문 대문자로 입력해주세요 (띄어쓰기로 줄바꿈 가능)</div>
+                </div>
+
+                <div class="form-group">
+                    <label>카드 공개 시간</label>
+                    <input type="datetime-local" id="TimeInput">
+                </div>
+
+                <button class="create-btn" onclick="createRoom()">방 만들기</button>
+
+                <div style="margin-top: 20px; text-align: center;">
+                    <a href="#" onclick="toggleRejoin()" style="color:#999; font-size:12px; text-decoration:none;">이미 방이
+                        있나요?</a>
+                    <div id="rejoin-box" style="display:none; margin-top:10px;">
+                        <input type="text" id="RejoinId" placeholder="방 ID" style="padding:10px; width:150px;">
+                        <button class="secondary-btn" onclick="manualRejoin()">입장</button>
+                    </div>
+                </div>
+
+                <div id="recent-rooms-area"
+                    style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; display:none;">
+                    <label>최근 만든 방</label>
+                    <div id="recent-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD SCREEN -->
+    <div id="screen-dashboard" class="screen">
+        <div class="dashboard-header">
+            <div>
+                <span class="dashboard-title">ROOM <span id="room-id-display"></span></span>
+                <!-- Badge Removed per request -->
+            </div>
+            <div>
+                <button class="secondary-btn" style="border:none; background:#FEE500;" onclick="shareToMe()">나에게 공유
+                    (기록용)</button>
+                <button class="secondary-btn" onclick="goHome()">홈</button>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="panel">
+                <div id="live-section">
+                    <h3>실시간 참여 현황 <span style="font-size:12px; font-weight:normal; color:#666;">(클릭하여 상세보기)</span></h3>
+                    <div id="live-grid" class="grid-box"></div>
+                </div>
+
+                <div id="result-wrapper" style="display:none; margin-top:0;">
+                    <h3>완성된 카드</h3>
+                    <div style="font-size:12px; color:#666; margin-bottom:10px;">카드를 클릭하거나 버튼을 눌러 뒷면에 편지를 쓰세요
+                    </div>
+
+                    <!-- 3D Card Scene for Host -->
+                    <div class="scene" id="hostScene">
+                        <div class="card-flip-btn" onclick="flipHostCard()">뒤집기</div>
+                        <div class="card" id="hostCard" onclick="flipHostCard()">
+                            <div class="card-face card-front" style="background:#A14343;">
+                                <img id="final-img" style="width:100%; height:100%; object-fit:contain;" src=""
+                                    onload="adjustHostCardSize(this)">
+                            </div>
+                            <div class="card-face card-back" onclick="event.stopPropagation()">
+                                <!-- Stop propagation to prevent accidental flip while typing -->
+                                <h3 style="border:none;">To. Friends</h3>
+                                <textarea id="HostLetter" placeholder="친구들에게 보낼 메시지를 여기에 적어주세요!"
+                                    style="width:100%; flex:1; padding:15px; background:#fafafa; border:1px solid #eee;"></textarea>
+                                <button class="secondary-btn"
+                                    style="width:100%; margin-top:10px; background:transparent; color:#fff; border:none; text-decoration:underline; font-weight:normal;"
+                                    onclick="saveHostLetter()">편지 저장</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:20px; text-align:center;">
+                        <button class="secondary-btn" onclick="downloadImg()">이미지(GIF) 다운로드</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div style="margin-bottom:30px;">
+                    <h3>초대 링크</h3>
+                    <div id="share-link" class="link-box"></div>
+                    <button class="secondary-btn" style="width:100%" onclick="copyLink()">링크 복사</button>
+                    <button class="secondary-btn" style="width:100%; margin-top:10px; background:#FEE500; border:none;"
+                        onclick="shareKakao()">친구에게 공유하기</button>
+
+                    <div id="contributors-section" style="margin-top:40px; display:none;">
+                        <h3>친구들의 기록</h3>
+                        <div id="contributors-list"
+                            style="display:flex; flex-direction:column; gap:15px; max-height: 400px; overflow-y: auto;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DETAIL MODAL -->
+            <!-- DETAIL MODAL -->
+            <div id="detail-modal" class="modal-overlay" onclick="closeModal()">
+                <!-- Flip Scene Container -->
+                <div class="scene" style="width:300px; height:300px;" onclick="event.stopPropagation()">
+
+                    <div class="card-flip-btn" onclick="flipDetailCard()">뒤집기</div>
+
+                    <div class="card" id="detailCard" onclick="flipDetailCard()">
+                        <!-- Front: Drawing -->
+                        <div class="card-face card-front"
+                            style="background:#fff; border:1px solid #000; position:relative;">
+                            <div id="modal-char"
+                                style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:150px; color:#eee; z-index:-1;">
+                                ?</div>
+                            <canvas id="modal-canvas" width="300" height="300"
+                                style="width:100%; height:100%; object-fit:contain;"></canvas>
+                        </div>
+
+                        <!-- Back: Message -->
+                        <div class="card-face card-back" style="background:#fff; border:1px solid #000;">
+                            <h3 id="modal-user-back" style="margin-top:0; border:none;">From. User</h3>
+                            <div id="modal-msg"
+                                style="flex:1; display:flex; align-items:center; justify-content:center; padding:10px; font-size:16px; white-space:pre-wrap; overflow-y:auto; word-break:break-all;">
+                                (Message)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="card-management-section">
+                <h3>카드 관리</h3>
+                <p id="make-desc" style="font-size:12px; color:#666;">공개 시간이 되면 카드를 완성할 수 있어요</p>
+                <button id="make-btn" class="create-btn" onclick="makeFinalCard()" disabled>공개 대기 중</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        let myRoomId = null;
+        let openTime = null;
+        let isOpened = false;
+        let currentHostName = "";
+
+        window.onload = function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomId = urlParams.get('room');
+            if (roomId) rejoinRoom(roomId);
+
+            const now = new Date();
+            now.setDate(now.getDate() + 1);
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('TimeInput').value = now.toISOString().slice(0, 16);
+
+            // Pre-fill default text - REMOVED per user request
+            // const ta = document.getElementById('TextInput');
+            // ta.value = "SHARE\nYOUR\nHEART"; 
+            updatePreview("SHARE\nYOUR\nHEART", true); // Show example in grid only (Placeholder mode)
+            // handleInput(); // Don't call handleInput as it would clear the grid (since val is empty)
+
+            loadRoomHistory();
+            initKakao();
+        };
+
+        let isFlipping = false;
+        function flipHostCard() {
+            if (isFlipping) return;
+            isFlipping = true;
+            document.getElementById('hostCard').classList.toggle('is-flipped');
+            setTimeout(() => isFlipping = false, 600);
+        }
+
+        // 3D Tilt Effect
+        document.addEventListener('mousemove', function (e) {
+            if (isFlipping) return;
+
+            const card = document.getElementById('hostCard');
+            if (!card) return;
+            const scene = document.getElementById('hostScene');
+            if (!scene.contains(e.target) && e.target !== scene) {
+                card.style.setProperty('--rx', '0deg');
+                card.style.setProperty('--ry', '0deg');
+                return;
+            }
+
+            // Disable tilt on button hover
+            if (e.target.closest('.card-flip-btn')) {
+                card.style.setProperty('--rx', '0deg');
+                card.style.setProperty('--ry', '0deg');
+                return;
+            }
+
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = ((y - centerY) / centerY) * -25; // Max 25deg
+            const rotateY = ((x - centerX) / centerX) * 25;
+
+            card.style.setProperty('--rx', `${rotateX}deg`);
+            card.style.setProperty('--ry', `${rotateY}deg`);
+
+            const bgX = 50 + ((x / rect.width) - 0.5) * 200; // Move gradient
+            const bgY = 50 + ((y / rect.height) - 0.5) * 200;
+
+            card.style.setProperty('--bg-x', `${bgX}%`);
+            card.style.setProperty('--bg-y', `${bgY}%`);
+        });
+
+        // Reset on leave
+        document.addEventListener('mouseout', function (e) {
+            const card = document.getElementById('hostCard');
+            if (card) {
+                card.style.setProperty('--rx', '0deg');
+                card.style.setProperty('--ry', '0deg');
+            }
+        });
+
+        function adjustHostCardSize(img) {
+            const scene = document.getElementById('hostScene');
+            // Allow up to screen width
+            const maxWidth = Math.min(window.innerWidth - 80, 600);
+
+            if (img.naturalWidth && img.naturalHeight) {
+                const ratio = img.naturalWidth / img.naturalHeight;
+                let w = maxWidth;
+                let h = w / ratio;
+                if (h < 300) h = 300;
+                scene.style.width = w + "px";
+                scene.style.height = h + "px";
+            }
+        }
+
+        function toggleRejoin() {
+            const box = document.getElementById('rejoin-box');
+            box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function handleInput() {
+            const ta = document.getElementById('TextInput');
+            // Allow newlines again
+            ta.value = ta.value.toUpperCase().replace(/[^A-Z0-9\n ]/g, "");
+            updatePreview(ta.value, false);
+        }
+
+        function updatePreview(text, isPlaceholder = false) {
+            const box = document.getElementById('preview-grid');
+            box.innerHTML = '';
+
+            // Split by newline and filter out empty lines to prevent empty rows
+            const lines = text.split('\n').filter(line => line.trim().length > 0);
+            lines.forEach(line => {
+                const row = document.createElement('div');
+                row.className = 'row';
+                for (let char of line) {
+                    const slot = document.createElement('div');
+                    slot.className = 'slot';
+                    if (char === ' ') slot.classList.add('empty');
+                    else {
+                        slot.innerText = char;
+                        if (!isPlaceholder) {
+                            slot.classList.add('filled'); // Apply the color only if NOT placeholder
+                        }
+                    }
+                    row.appendChild(slot);
+                }
+                box.appendChild(row);
+            });
+        }
+
+        async function createRoom() {
+            const hostName = document.getElementById('HostNameInput').value;
+            const text = document.getElementById('TextInput').value;
+            const time = document.getElementById('TimeInput').value;
+
+            if (!text.trim() || !time) return alert("모든 항목을 입력해주세요.");
+
+            const lines = text.split('\n').filter(line => line.trim().length > 0);
+            let maxLen = 0; lines.forEach(l => maxLen = Math.max(maxLen, l.length));
+            let paddedText = ""; lines.forEach(l => paddedText += l.padEnd(maxLen, " "));
+
+            try {
+                const res = await fetch('/create_room', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: paddedText,
+                        columns: maxLen,
+                        open_time: time,
+                        host_name: hostName
+                    })
+                });
+                const data = await res.json();
+                saveRoomToHistory(data.room_id, hostName);
+                rejoinRoom(data.room_id);
+            } catch (e) { alert("방 생성 오류"); }
+        }
+
+        function manualRejoin() {
+            const rid = document.getElementById('RejoinId').value.trim();
+            if (rid) rejoinRoom(rid);
+        }
+
+        async function rejoinRoom(roomId) {
+            myRoomId = roomId;
+            try {
+                const res = await fetch(`/status/${roomId}`);
+                const data = await res.json();
+                if (data.error) { alert("방을 찾을 수 없습니다"); return; }
+
+                currentHostName = data.host_name;
+
+                document.getElementById('screen-setup').classList.remove('active');
+                document.getElementById('screen-dashboard').classList.add('active');
+
+                openTime = new Date(data.open_time);
+                document.querySelector('.dashboard-title').innerText = `${data.host_name}의 ROOM ${roomId}`;
+
+                const url = window.location.origin + "/?room=" + roomId;
+                document.getElementById('share-link').innerText = url;
+                window.history.pushState({}, '', '/host?room=' + roomId);
+
+                checkTime();
+                renderLiveGrid(data.slots, data.columns);
+                checkFinalCard();
+                populateContributors(data.slots);
+
+                // If host message exists, pre-fill it
+                if (data.host_message) {
+                    document.getElementById('HostLetter').value = data.host_message;
+                }
+
+                setInterval(() => {
+                    checkTime();
+                    fetchLiveStatus();
+                    // checkFinalCard(); // Don't check constantly to avoid flicker
+                }, 3000);
+
+            } catch (e) {
+                console.error(e);
+                alert("방 로드 실패: " + e);
+            }
+        }
+
+        function checkTime() {
+            const now = new Date();
+            // const badge = document.getElementById('d-day-badge'); // Removed
+            const btn = document.getElementById('make-btn');
+            const desc = document.getElementById('make-desc');
+
+            if (now >= openTime) {
+                isOpened = true;
+                // badge.innerText = "오픈됨";
+                // badge.style.background = "#00C853";
+                desc.innerText = "시간이 되었습니다! 최종 카드를 생성하세요.";
+                btn.disabled = false;
+                btn.innerText = "최종 카드 생성";
+            } else {
+                isOpened = false;
+                const diffMs = openTime - now;
+                const diffMins = Math.ceil(diffMs / (1000 * 60));
+
+                let timeText = "";
+                if (diffMins > 60) {
+                    const h = Math.floor(diffMins / 60);
+                    const m = diffMins % 60;
+                    timeText = `${h}시간 ${m}분 남음`;
+                } else {
+                    timeText = `${diffMins}분 남음`;
+                }
+
+                // badge.innerText = `잠김 (${timeText})`;
+                // badge.style.background = "#000";
+                desc.innerText = "설정된 시간이 되면 버튼이 활성화됩니다.";
+                btn.disabled = true;
+                btn.innerText = `오픈 대기중 (${timeText})`;
+            }
+        }
+
+        async function fetchLiveStatus() {
+            if (!myRoomId) return;
+            const res = await fetch(`/status/${myRoomId}`);
+            const data = await res.json();
+            if (!data.error) {
+                renderLiveGrid(data.slots, data.columns);
+            }
+        }
+
+        let lastSlotsJSON = "";
+
+        function renderLiveGrid(slots, cols) {
+            // Optimization: Skip redraw if data hasn't changed
+            // Use a simplified version to avoid huge stringify if slots have extra data?
+            // Slots list is moderate size. JSON.stringify is fast enough.
+            // Filter hidden slots before stringify to match what we render
+            const visibleSlots = slots.filter(s => !s.hidden);
+            const currentJSON = JSON.stringify(visibleSlots);
+
+            if (currentJSON === lastSlotsJSON) return;
+            lastSlotsJSON = currentJSON;
+
+            const box = document.getElementById('live-grid');
+            box.innerHTML = '';
+
+            let rowDiv = document.createElement('div');
+            rowDiv.className = 'row';
+
+            visibleSlots.forEach((slot, idx) => {
+                // Hidden slots already filtered out above
+                // We need to access the correct slot data when clicking. 
+                // Using 'visibleSlots' array index is safe for valid closure reference within this loop.
+                const availableSlots = visibleSlots;
+
+
+                if (idx > 0 && idx % cols === 0) {
+                    box.appendChild(rowDiv);
+                    rowDiv = document.createElement('div');
+                    rowDiv.className = 'row';
+                }
+
+                const el = document.createElement('div');
+                el.className = 'slot';
+                // Inline styles removed. Controlled by CSS .slot
+
+
+                if (slot.char === ' ') {
+                    el.classList.add('empty');
+                } else {
+                    if (slot.is_filled) {
+                        el.style.cursor = "pointer";
+                        el.onclick = () => openDetail(availableSlots[idx]);
+
+                        if (isOpened && slot.strokes) {
+                            // Render Canvas in slot
+                            el.style.backgroundColor = "#fff"; // White background for canvas
+                            el.style.border = "1px solid #ccc";
+                            el.innerHTML = ''; // Clear text
+
+                            const cvs = document.createElement('canvas');
+                            cvs.width = 100; // Render at higher internal res
+                            cvs.height = 100;
+                            cvs.style.width = '100%';
+                            cvs.style.height = '100%';
+
+                            const ctx = cvs.getContext('2d');
+                            renderStrokes(ctx, slot.strokes, 100, 100);
+                            el.appendChild(cvs);
+                        } else {
+                            // Normal "Participated" state (Brown block)
+                            el.style.backgroundColor = "#A14343";
+                            el.style.color = "#fff";
+                            el.innerText = slot.char;
+                        }
+                    } else {
+                        el.innerText = slot.char;
+                    }
+                }
+                rowDiv.appendChild(el);
+            });
+            box.appendChild(rowDiv);
+        }
+
+        async function makeFinalCard() {
+            if (!myRoomId) return;
+            const btn = document.getElementById('make-btn');
+            btn.disabled = true; btn.innerText = "생성 중...";
+
+            try {
+                // 1. Generate Card
+                await fetch(`/make-card/${myRoomId}`, { method: 'POST' });
+
+                // 2. Refresh Status to get updated Open Time (SERVER set it to Now)
+                const sRes = await fetch(`/status/${myRoomId}`);
+                const sData = await sRes.json();
+
+                // Force open immediately logic
+                openTime = new Date(); // Force 'now' on client too
+                isOpened = true;
+                checkTime();
+
+                // 3. Check for the image
+                setTimeout(checkFinalCard, 500); // Small delay to let FS settle
+                alert("카드 생성 완료!");
+            } catch (e) { alert("생성 실패"); console.error(e); }
+
+            if (!isOpened) { // Should be open now
+                btn.disabled = false; btn.innerText = "재생성";
+            }
+        }
+
+        function populateContributors(slots) {
+            const cSection = document.getElementById('contributors-section');
+            const cList = document.getElementById('contributors-list');
+            if (!cList) return;
+
+            cList.innerHTML = '';
+            let count = 0;
+            let filled = 0, system = 0, noName = 0;
+
+            // Sort by creation or key? Key is safe.
+            Object.values(slots).forEach(slot => {
+                if (slot.is_filled) filled++;
+                if (slot.reserved_by === 'SYSTEM') system++;
+                if (slot.is_filled && !slot.reserved_by) noName++;
+
+                if (!slot.is_filled || !slot.reserved_by) return;
+                if (slot.reserved_by === 'SYSTEM') return; // Hide auto-filled slots
+                count++;
+
+                const item = document.createElement('div');
+                item.style.cssText = "display:flex; align-items:flex-start; gap:10px; padding:10px; border:1px solid #eee; background:#fafafa; border-radius:8px;";
+
+                let visual = '';
+                // Check if image_path is relative or absolute or base64?
+                // slot.image_path usually "static/drawings/..."
+                if (slot.image_path) {
+                    const src = slot.image_path.startsWith('/') ? slot.image_path : '/' + slot.image_path;
+                    visual = `<img src="${src}" style="width:60px; height:60px; object-fit:contain; border:1px solid #ddd; background:#fff;">`;
+                } else {
+                    visual = `<div style="width:60px; height:60px; display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid #ddd; font-weight:bold; font-size:24px;">${slot.char}</div>`;
+                }
+
+                const msg = slot.message || '(내용 없음)';
+
+                item.innerHTML = `
+                    ${visual}
+                    <div style="flex:1;">
+                        <div style="font-weight:bold; font-size:14px; margin-bottom:4px;">From. ${slot.reserved_by}</div>
+                        <div style="font-size:13px; color:#555; white-space:pre-wrap;">${msg}</div>
+                    </div>
+                `;
+                cList.appendChild(item);
+            });
+
+            if (count === 0) {
+                const total = Object.keys(slots).length;
+                cList.innerHTML = `<div style="color:#999; text-align:center; padding:20px; font-size:13px;">
+                    아직 친구들이 남긴 기록이 없습니다.<br>
+                    <span style="font-size:10px; opacity:0.7">
+                    (Total: ${total}, Fill: ${filled}, Sys: ${system}, NoName: ${noName})
+                    </span>
+                </div>`;
+            }
+        }
+
+        async function checkFinalCard() {
+            if (!isOpened) {
+                document.getElementById('result-wrapper').style.display = 'none';
+                return;
+            }
+            // Direct Image Load Check
+            const img = document.getElementById('final-img');
+            const src = `/result_card/${myRoomId}?t=` + new Date().getTime();
+
+            img.onload = function () {
+                document.getElementById('result-wrapper').style.display = 'block';
+                document.getElementById('card-management-section').style.display = 'none';
+
+                const cSection = document.getElementById('contributors-section');
+                if (cSection) cSection.style.display = 'block';
+
+                // Hide Live Grid Section only
+                const liveSection = document.getElementById('live-section');
+                if (liveSection) liveSection.style.display = 'none';
+
+                adjustHostCardSize(this);
+            };
+            img.onerror = function () {
+                document.getElementById('result-wrapper').style.display = 'none';
+            };
+            img.src = src;
+        }
+
+        async function saveHostLetter() {
+            const msg = document.getElementById('HostLetter').value;
+            if (!msg.trim()) return alert("메시지를 작성해주세요.");
+            try {
+                await fetch(`/host-message/${myRoomId}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_name: "HOST", message: msg })
+                });
+                alert("편지 저장 완료!");
+            } catch (e) { alert("편지 저장 오류"); }
+        }
+
+        function copyLink() {
+            const url = document.getElementById('share-link').innerText;
+            navigator.clipboard.writeText(url).then(() => alert("링크 복사 완료!"));
+        }
+
+        function downloadImg() {
+            const src = document.getElementById('final-img').src;
+            if (!src) return;
+            const a = document.createElement('a');
+            a.href = src;
+            // Try to detect extension
+            const ext = src.includes('.gif') ? '.gif' : '.jpg';
+            a.download = `Card_${myRoomId}${ext}`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
+        function goHome() {
+            if (confirm("홈으로 돌아가시겠습니까?")) {
+                window.location.href = "/host";
+            }
+        }
+
+        function shareToMe() {
+            if (!Kakao.isInitialized()) return alert("카카오 초기화 중...");
+            // Use Template or Feed, but for 'Send to Me', it's usually just a share that you pick yourself as target
+            // But Kakao JS SDK 'share' usually opens friend picker. 'Send to me' specific API might require different scope.
+            // Simpler: Just trigger share flow, user picks "My Chatroom".
+            const url = window.location.href; // Host URL
+            Kakao.Share.sendDefault({
+                objectType: 'text',
+                text: `[ONE TYPE ONE LETTER]\n내 방 관리 페이지\nRoom: ${myRoomId}`,
+                link: { mobileWebUrl: url, webUrl: url },
+                buttonTitle: '관리 페이지 바로가기'
+            });
+        }
+
+        /* Detail View Logic */
+        function openDetail(slot) {
+            if (!isOpened) return; // Only allow when room is finally opened
+            if (!slot.is_filled) return;
+            const modal = document.getElementById('detail-modal');
+            const canvas = document.getElementById('modal-canvas');
+            const ctx = canvas.getContext('2d');
+
+            document.getElementById('modal-user').innerText = `From. ${slot.user || 'Unknown'}`;
+            document.getElementById('modal-msg').innerText = slot.message || "메시지가 없습니다.";
+            document.getElementById('modal-char').innerText = slot.char;
+
+            // clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Render strokes
+            if (slot.strokes) {
+                renderStrokes(ctx, slot.strokes, canvas.width, canvas.height);
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function flipDetailCard() {
+            document.getElementById('detailCard').classList.toggle('is-flipped');
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').style.display = 'none';
+            // Reset flip
+            document.getElementById('detailCard').classList.remove('is-flipped');
+        }
+
+        function renderStrokes(ctx, strokes, w, h) {
+            const scale = w / 340.0; // Client was 340x340
+
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            strokes.forEach(s => {
+                if (!s.points || s.points.length < 1) return;
+
+                ctx.strokeStyle = s.color;
+                ctx.fillStyle = s.color;
+                const scaledWidth = s.width * scale;
+
+                const pts = s.points.map(p => ({ x: p.x * scale, y: p.y * scale }));
+
+                if (s.type === 'line') {
+                    if (pts.length < 2) {
+                        ctx.beginPath(); ctx.arc(pts[0].x, pts[0].y, scaledWidth / 2, 0, Math.PI * 2); ctx.fill();
+                    } else {
+                        ctx.beginPath(); ctx.lineWidth = scaledWidth;
+                        ctx.moveTo(pts[0].x, pts[0].y);
+                        for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+                        ctx.stroke();
+                    }
+                }
+                else if (s.type === 'heart') {
+                    ctx.font = `${scaledWidth * 1.5}px Arial`;
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    const interval = 3;
+                    for (let i = 0; i < pts.length; i += interval) {
+                        ctx.fillText("♥", pts[i].x, pts[i].y);
+                    }
+                }
+                else if (s.type === 'v-stitch') {
+                    ctx.lineWidth = scaledWidth / 3;
+                    ctx.beginPath();
+                    for (let i = 0; i < pts.length; i += 3) {
+                        let x = pts[i].x, y = pts[i].y;
+                        let sz = scaledWidth;
+                        ctx.moveTo(x - sz / 2, y - sz / 2);
+                        ctx.lineTo(x, y + sz / 2);
+                        ctx.lineTo(x + sz / 2, y - sz / 2);
+                    }
+                    ctx.stroke();
+                }
+            });
+        }
+
+        function saveRoomToHistory(roomId, hostName) {
+            let history = JSON.parse(localStorage.getItem('myRooms') || '[]');
+            history = history.filter(r => r.id !== roomId);
+            history.unshift({ id: roomId, name: hostName, date: new Date().toISOString() });
+            if (history.length > 5) history = history.slice(0, 5);
+            localStorage.setItem('myRooms', JSON.stringify(history));
+        }
+
+        function loadRoomHistory() {
+            const history = JSON.parse(localStorage.getItem('myRooms') || '[]');
+            const list = document.getElementById('recent-list');
+            const area = document.getElementById('recent-rooms-area');
+
+            if (history.length === 0) {
+                area.style.display = 'none';
+                return;
+            }
+
+            area.style.display = 'block';
+            list.innerHTML = '';
+
+            history.forEach(room => {
+                const div = document.createElement('div');
+                div.className = 'recent-item';
+                div.onclick = () => rejoinRoom(room.id);
+                div.innerHTML = `
+        <span style="font-weight:bold; font-size:14px;">${room.name}</span>
+        <span style="font-size:12px; color:#999;">ID: ${room.id}</span>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        async function initKakao() {
+            try {
+                const res = await fetch('/api/config');
+                const config = await res.json();
+                if (config.kakao_key && config.kakao_key !== "YOUR_KAKAO_JS_KEY_HERE") {
+                    Kakao.init(config.kakao_key);
+                }
+            } catch (e) { console.log("Kakao init failed"); }
+        }
+
+        function shareKakao() {
+            if (!Kakao.isInitialized()) {
+                alert("카카오 키가 설정되지 않았습니다. .env 파일을 확인해주세요.");
+                return;
+            }
+
+            const url = window.location.origin + "/?room=" + myRoomId;
+
+            Kakao.Share.sendDefault({
+                objectType: 'feed',
+                content: {
+                    title: `${currentHostName}님의 롤링페이퍼`,
+                    description: `${currentHostName}님이 초대했습니다.\n함께 카드를 꾸며주세요!`,
+                    imageUrl: 'https://cdn-icons-png.flaticon.com/512/1077/1077063.png',
+                    link: {
+                        mobileWebUrl: url,
+                        webUrl: url,
+                    },
+                },
+                buttons: [
+                    {
+                        title: '참여하기',
+                        link: {
+                            mobileWebUrl: url,
+                            webUrl: url,
+                        },
+                    },
+                ],
+            });
+        }
+    </script>
+</body>
+
+</html>
