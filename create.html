@@ -165,6 +165,43 @@
             background-color: #333;
         }
 
+        /* Fixed Grid Layout */
+        .grid-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            background: #eee;
+            padding: 10px;
+            border-radius: 4px;
+            min-height: 100px;
+            align-content: flex-start;
+        }
+
+        .slot {
+            width: 50px;
+            height: 50px;
+            background: #fff;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .slot.filled {
+            background-color: #A14343;
+            color: white;
+            border-color: #8c3a3a;
+        }
+
+        .slot.empty {
+            background-color: #eee;
+            border: 1px dashed #ccc;
+        }
+
         /* Screen switching */
         .screen {
             display: none;
@@ -979,8 +1016,11 @@
 
         function renderLiveGrid(slots, cols) {
             const slotArray = Array.isArray(slots) ? slots : Object.values(slots);
-            // Filter: Remove hidden slots
-            const visibleSlots = slotArray.filter(s => !s.hidden);
+
+            // Filter: Remove hidden slots AND Sort by Position
+            const visibleSlots = slotArray
+                .filter(s => !s.hidden)
+                .sort((a, b) => parseInt(a.position) - parseInt(b.position));
 
             const currentJSON = JSON.stringify(visibleSlots);
             if (currentJSON === lastSlotsJSON) return;
@@ -989,10 +1029,10 @@
             const box = document.getElementById('live-grid');
             box.innerHTML = '';
 
-            // Flex Wrap Layout
+            // Flex Wrap Layout - Controlled by CSS .grid-box now, but ensures robust inline defaults just in case
             box.style.display = 'flex';
             box.style.flexWrap = 'wrap';
-            box.style.justifyContent = 'center';
+            box.style.justifyContent = 'flex-start';
             box.style.alignContent = 'flex-start';
             box.style.gap = '2px';
 
