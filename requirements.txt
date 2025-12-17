@@ -1,7 +1,6 @@
-fastapi==0.123.0
-pydantic==2.12.5
-pillow==11.3.0
-uvicorn==0.38.0
+fastapi
+pydantic
+pillow
+uvicorn
 python-dotenv
 firebase-admin
-

@@ -368,8 +368,14 @@ def generate_card(room_id: str):
         else:
             # Draw Text Char
             try:
-                try: font = ImageFont.truetype("arialbd.ttf", 160)
-                except: font = ImageFont.load_default()
+                try: 
+                    # Use bundled font if available (for Vercel)
+                    if os.path.exists("NanumGothic-Bold.ttf"):
+                        font = ImageFont.truetype("NanumGothic-Bold.ttf", 160)
+                    else:
+                        font = ImageFont.truetype("arialbd.ttf", 160)
+                except: 
+                    font = ImageFont.load_default()
                 
                 bbox = draw.textbbox((0, 0), slot['char'], font=font)
                 w = bbox[2] - bbox[0]
@@ -413,7 +419,7 @@ def generate_card(room_id: str):
 
 # Include helper function make_card_draw_strokes (copied from original)
 def make_card_draw_strokes(draw, ox, oy, strokes, w, h):
-    scale = w / 340.0
+    scale = (w / 340.0) * 1.5 # Boost stroke thickness by 1.5x
     for stroke in strokes:
         color = stroke.get('color', '#000000')
         width = stroke.get('width', 5)
@@ -440,7 +446,11 @@ def make_card_draw_strokes(draw, ox, oy, strokes, w, h):
         elif s_type == 'heart':
              # Simplified copy of original logic...
              f_size = int(scaled_width * 3)
-             try: font = ImageFont.truetype("arial.ttf", f_size)
+             try: 
+                 if os.path.exists("NanumGothic-Bold.ttf"):
+                    font = ImageFont.truetype("NanumGothic-Bold.ttf", f_size)
+                 else:
+                    font = ImageFont.truetype("arial.ttf", f_size)
              except: font = ImageFont.load_default()
              draw.text(render_points[0], "♥", font=font, fill=color)
         elif s_type == 'v-stitch':
