@@ -297,6 +297,20 @@
             gap: 40px;
         }
 
+        /* Dashboard Layout */
+        .dashboard-grid {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        /* Responsive: Stack on small screens */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                flex-direction: column;
+            }
+        }
+
         .panel {
             background: #fff;
         }
@@ -729,7 +743,7 @@
 
 
             <div style="margin-top:20px; text-align:center;">
-                <button class="secondary-btn" onclick="downloadImg()">이미지(GIF) 다운로드</button>
+                <!-- <button class="secondary-btn" onclick="downloadImg()">이미지(GIF) 다운로드</button> -->
             </div>
 
             <div class="panel">
@@ -1068,7 +1082,10 @@
                     el.classList.add('empty');
                 } else {
                     el.innerText = slot.char;
-                    el.classList.add('filled');
+                    // Only color if actually participated
+                    if (slot.is_filled || slot.filled) {
+                        el.classList.add('filled');
+                    }
                 }
 
                 // Visual override (Images/Strokes)
