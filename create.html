@@ -221,8 +221,8 @@
         }
 
         #live-grid .slot.empty {
-            background-color: #eee;
-            border: 1px dashed #ccc;
+            background-color: #fff;
+            border: 1px solid #ddd;
         }
 
         /* Allow stickers to hang off card */
@@ -907,8 +907,8 @@
                     if (char === ' ') slot.classList.add('empty');
                     else {
                         slot.innerText = char;
-                        if (!isPlaceholder) {
-                            slot.classList.add('filled'); // Apply the color only if NOT placeholder
+                        if (char !== ' ') {
+                            slot.classList.add('filled');
                         }
                     }
                     row.appendChild(slot);
