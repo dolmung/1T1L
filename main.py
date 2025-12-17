@@ -360,12 +360,22 @@ def generate_card(room_id: str):
     bg_color = (161, 67, 67, 255) # #A14343
     
     def draw_slot(draw, x, y, slot, frame_idx):
-        if slot.get('char', '').strip():
-             draw.rectangle([x, y, x+slot_w, y+slot_h], fill=(255,255,255))
-        
-        if slot.get('is_filled') and slot.get('strokes'):
-            make_card_draw_strokes(draw, x, y, slot['strokes'], slot_w, slot_h)
-        else:
+        # Create a separate image for the slot to ensure clipping
+        # Background is white (Paper)
+        slot_img = Image.new('RGBA', (slot_w, slot_h), (255, 255, 255, 255))
+        slot_draw = ImageDraw.Draw(slot_img)
+
+        is_filled = slot.get('is_filled') and slot.get('strokes')
+
+        # Draw strokes onto the slot image (offset 0,0)
+        if is_filled:
+            make_card_draw_strokes(slot_draw, 0, 0, slot['strokes'], slot_w, slot_h)
+
+        # Paste the slot image onto the main image
+        # This handles the white background AND the strokes, clipped to size
+        img.paste(slot_img, (int(x), int(y)))
+
+        if not is_filled:
             # Draw Text Char
             try:
                 try: 

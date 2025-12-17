@@ -447,7 +447,7 @@
         <div class="scene">
             <!-- Flip Button attached to scene -->
             <!-- Flip Button attached to scene -->
-            <div class="card-flip-btn" onclick="flipCard()">편지 쓰기</div>
+            <div class="card-flip-btn" id="mainFlipBtn" onclick="flipCard()">편지 쓰기</div>
 
             <div class="card" id="mainCard">
                 <div class="card-face card-front">
@@ -502,7 +502,7 @@
                     <div class="color-btn" style="background:#000000" onclick="setColor('#000000', this)"></div>
                     <div class="color-btn" style="background:#546E7A" onclick="setColor('#546E7A', this)"></div>
                 </div>
-                <button class="btn-clear-all" onclick="clearAll()">전체 삭제</button>
+                <button class="btn-clear-all" onclick="undoLast()">뒤로가기</button>
             </div>
 
             <button class="btn-submit-large" onclick="submitCard()">보내기</button>
@@ -638,7 +638,7 @@
             isFlipped = !isFlipped;
             const card = document.getElementById('mainCard');
             const guide = document.getElementById('guideText');
-            const btn = document.querySelector('.card-flip-btn'); // Get the button
+            const btn = document.getElementById('mainFlipBtn'); // Fixed selector
 
             stopDrawing();
             if (isFlipped) {
@@ -883,8 +883,12 @@
                 activeColorBtn.classList.add('active');
             }
         }
-        function clearAll() {
-            if (confirm("정말 다 지우시겠어요?")) drawingStrokes = [];
+        // Undo Last Stroke
+        function undoLast() {
+            if (drawingStrokes.length > 0) {
+                drawingStrokes.pop();
+                renderCanvas(true);
+            }
         }
         function downloadResult() {
             const img = document.querySelector('#final-screen img');
@@ -900,7 +904,11 @@
         async function submitCard() {
             try {
                 const msg = document.getElementById('letterMsg').value;
-                if (!msg) return alert("메시지를 작성해주세요!");
+                if (!msg) {
+                    alert("메시지를 작성해주세요!");
+                    if (!isFlipped) flipCard(); // Auto flip to message side
+                    return;
+                }
 
                 clearTimeout(animationFrameId);
                 renderCanvas(false);

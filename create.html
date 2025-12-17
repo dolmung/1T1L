@@ -542,9 +542,11 @@
     <!-- DASHBOARD SCREEN -->
     <div id="screen-dashboard" class="screen">
         <div class="dashboard-header">
-            <div>
+            <div style="display:flex; flex-direction:column; gap:5px;">
+                <div style="font-weight:900; font-size:32px; line-height:1; letter-spacing:-1px;">ONE TYPE<br>ONE LETTER
+                </div>
+                <div style="font-size:12px; font-weight:bold; margin-bottom:10px;">ONLINE Rolling Paper</div>
                 <span class="dashboard-title">ROOM <span id="room-id-display"></span></span>
-                <!-- Badge Removed per request -->
             </div>
             <div>
                 <button class="secondary-btn" onclick="goHome()">홈</button>
@@ -1298,7 +1300,7 @@
                 content: {
                     title: `${currentHostName}님의 롤링페이퍼`,
                     description: `${currentHostName}님이 초대했습니다.\n함께 카드를 꾸며주세요!`,
-                    imageUrl: 'https://1t1l.vercel.app/thumb.jpg',
+                    imageUrl: 'https://1t1l.vercel.app/static/thumb.jpg',
                     link: {
                         mobileWebUrl: url,
                         webUrl: url,
