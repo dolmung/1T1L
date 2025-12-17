@@ -963,13 +963,13 @@
         let lastSlotsJSON = "";
 
         function renderLiveGrid(slots, cols) {
-            // Optimization: Skip redraw if data hasn't changed
-            // Use a simplified version to avoid huge stringify if slots have extra data?
-            // Slots list is moderate size. JSON.stringify is fast enough.
-            // Filter hidden slots before stringify to match what we render
-            const visibleSlots = slots.filter(s => !s.hidden);
-            const currentJSON = JSON.stringify(visibleSlots);
+            // Robustly handle Array vs Dict
+            const slotArray = Array.isArray(slots) ? slots : Object.values(slots);
 
+            // Filter hidden slots first
+            const visibleSlots = slotArray.filter(s => !s.hidden);
+
+            const currentJSON = JSON.stringify(visibleSlots);
             if (currentJSON === lastSlotsJSON) return;
             lastSlotsJSON = currentJSON;
 
@@ -1291,70 +1291,175 @@
 
         function addSticker(content, isImage) {
             const container = document.getElementById('card-overlays');
-            const sticker = document.createElement('div');
 
-            if (isImage) {
-                const img = document.createElement('img');
-                img.src = content;
-                img.style.width = "100px";
-                img.style.height = "100px";
-                img.style.pointerEvents = "none";
-                sticker.appendChild(img);
-            } else {
-                sticker.innerText = content;
-                sticker.style.fontSize = "40px";
-                sticker.style.fontWeight = "bold";
-                sticker.style.color = "#fff";
-                sticker.style.textShadow = "2px 2px 0 #000";
-            }
-
-            sticker.style.cssText = `
+            // Wrapper for handles
+            const wrapper = document.createElement('div');
+            wrapper.className = 'sticker-wrapper';
+            wrapper.style.cssText = `
                 position: absolute; 
                 left: 50%; top: 50%; 
-                transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%) rotate(0deg);
+                width: 100px; height: 100px;
+                display: flex; justify-content: center; align-items: center;
                 cursor: grab;
                 user-select: none;
                 pointer-events: auto;
                 z-index: 1000;
-                display: flex; justify-content: center; align-items: center;
-                width: auto; height: auto;
+                border: 1px dashed transparent; 
             `;
 
-            // Drag Logic
-            let isDragging = false;
-            let startX, startY, initialLeft, initialTop;
+            // Hover effect
+            wrapper.onmouseenter = () => wrapper.style.borderColor = "#fff";
+            wrapper.onmouseleave = () => wrapper.style.borderColor = "transparent";
 
-            sticker.addEventListener('mousedown', (e) => {
+            // Content
+            const contentDiv = document.createElement('div');
+            contentDiv.style.width = "100%";
+            contentDiv.style.height = "100%";
+            contentDiv.style.display = "flex";
+            contentDiv.style.justifyContent = "center";
+            contentDiv.style.alignItems = "center";
+            contentDiv.style.pointerEvents = "none";
+
+            if (isImage) {
+                const img = document.createElement('img');
+                img.src = content;
+                img.style.width = "100%";
+                img.style.height = "100%";
+                img.style.objectFit = "contain";
+                contentDiv.appendChild(img);
+            } else {
+                contentDiv.innerText = content;
+                contentDiv.style.fontWeight = "bold";
+                contentDiv.style.color = "#fff";
+                contentDiv.style.textShadow = "2px 2px 0 #000";
+                contentDiv.style.fontSize = "40px";
+            }
+            wrapper.appendChild(contentDiv);
+
+            // Resize Handle (Bottom Right)
+            const resizeHandle = document.createElement('div');
+            resizeHandle.style.cssText = `
+                position: absolute; bottom: -5px; right: -5px;
+                width: 10px; height: 10px; background: #fff; border: 1px solid #000;
+                cursor: nwse-resize; z-index: 1001;
+            `;
+            wrapper.appendChild(resizeHandle);
+
+            // Rotate Handle (Top Center outside)
+            const rotateHandle = document.createElement('div');
+            rotateHandle.style.cssText = `
+                position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+                width: 10px; height: 10px; background: #FFD700; border: 1px solid #000; border-radius: 50%;
+                cursor: pointer; z-index: 1001;
+            `;
+            wrapper.appendChild(rotateHandle);
+
+
+            // --- Logic ---
+            let isDragging = false, isResizing = false, isRotating = false;
+            let startX, startY, startLeft, startTop, startWidth, startHeight, startAngle;
+
+            // 1. Drag
+            wrapper.addEventListener('mousedown', (e) => {
+                if (e.target === resizeHandle || e.target === rotateHandle) return;
+                if (e.button === 2) return;
                 isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                initialLeft = sticker.offsetLeft;
-                initialTop = sticker.offsetTop;
-                sticker.style.cursor = 'grabbing';
-                e.preventDefault(); // Prevent text selection
-                e.stopPropagation(); // Stop flip
+                startX = e.clientX; startY = e.clientY;
+                startLeft = wrapper.offsetLeft; startTop = wrapper.offsetTop;
+                wrapper.style.cursor = 'grabbing';
+                e.stopPropagation(); e.preventDefault();
+            });
+
+            // 2. Resize
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                startX = e.clientX; startY = e.clientY;
+                startWidth = wrapper.offsetWidth; startHeight = wrapper.offsetHeight;
+                e.stopPropagation(); e.preventDefault();
+            });
+
+            // 3. Rotate
+            rotateHandle.addEventListener('mousedown', (e) => {
+                isRotating = true;
+                const rect = wrapper.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                const dx = e.clientX - cx;
+                const dy = e.clientY - cy;
+                startAngle = Math.atan2(dy, dx) * (180 / Math.PI) - getRotation(wrapper);
+                e.stopPropagation(); e.preventDefault();
             });
 
             window.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                sticker.style.left = `${initialLeft + dx}px`;
-                sticker.style.top = `${initialTop + dy}px`;
+                if (isDragging) {
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    wrapper.style.left = (startLeft + dx) + 'px';
+                    wrapper.style.top = (startTop + dy) + 'px';
+                } else if (isResizing) {
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    let newW = Math.max(30, startWidth + dx);
+                    let newH = Math.max(30, startHeight + dy);
+                    wrapper.style.width = newW + 'px';
+                    wrapper.style.height = newH + 'px';
+
+                    if (!isImage) {
+                        // Scale font roughly 40% of box width
+                        contentDiv.style.fontSize = (newW * 0.4) + "px";
+                    }
+                } else if (isRotating) {
+                    const rect = wrapper.getBoundingClientRect();
+                    const cx = rect.left + rect.width / 2;
+                    const cy = rect.top + rect.height / 2;
+                    const dx = e.clientX - cx;
+                    const dy = e.clientY - cy;
+                    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                    // Standardize orientation: Top handle (-90) -> mouse angle
+                    // Element should verify. If handle is top, and mouse is at 0 (right), angle should be 90?
+                    // Let's use simple logic: angle - startAngle + initial?
+                    // Or absolute tracking.
+                    // StartAngle was (mouse - initial).
+                    // Current (mouse) - StartAngle = initial?
+                    // wrapper.style.transform = `translate(-50%, -50%) rotate(${angle - startAngle}deg)`;
+                    // Let's try simpler absolute tracking for handle.
+                    // If handle is at TOP (-90deg), and mouse is at ANGLE.
+                    // Card Angle should be ANGLE + 90.
+                    // Ex: Mouse at Right (0). Top handle moved to Right. Card rotated 90.
+                    wrapper.style.transform = `translate(-50%, -50%) rotate(${angle + 90}deg)`;
+                }
             });
 
             window.addEventListener('mouseup', () => {
-                isDragging = false;
-                sticker.style.cursor = 'grab';
+                isDragging = false; isResizing = false; isRotating = false;
+                wrapper.style.cursor = 'grab';
             });
+
+            function getRotation(el) {
+                const st = window.getComputedStyle(el, null);
+                const tr = st.getPropertyValue("-webkit-transform") ||
+                    st.getPropertyValue("-moz-transform") ||
+                    st.getPropertyValue("-ms-transform") ||
+                    st.getPropertyValue("-o-transform") ||
+                    st.getPropertyValue("transform") ||
+                    "none";
+                if (tr != "none") {
+                    const values = tr.split('(')[1].split(')')[0].split(',');
+                    const a = values[0]; const b = values[1];
+                    const angle = Math.round(Math.atan2(b, a) * (180 / Math.PI));
+                    return angle;
+                }
+                return 0;
+            }
 
             // Delete on right click
-            sticker.addEventListener('contextmenu', (e) => {
+            wrapper.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
-                if (confirm("이 스티커를 삭제할까요?")) sticker.remove();
+                if (confirm("이 스티커를 삭제할까요?")) wrapper.remove();
             });
 
-            container.appendChild(sticker);
+            container.appendChild(wrapper);
         }
 
         function goHome() {
