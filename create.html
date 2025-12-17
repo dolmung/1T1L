@@ -625,7 +625,7 @@
                             }
                         </style>
                         <div class="card-flip-btn" id="hostFlipBtn" onclick="flipHostCard()">편지 쓰기</div>
-                        <div class="card" id="hostCard" onclick="flipHostCard()">
+                        <div class="card" id="hostCard">
                             <div class="card-face card-front" style="background:#A14343; position:relative;">
                                 <img id="final-img" style="width:100%; height:100%; object-fit:contain;" src=""
                                     onload="adjustHostCardSize(this)">
@@ -1219,46 +1219,105 @@
             list.innerHTML = '';
             let count = 0;
 
-            // Filter Hidden Slots (Special Chars) OR just special logic for specials?
-            // Logic: slots that are hidden=true usually (from main.py spec)
             Object.values(slots).forEach(slot => {
-                if (slot.hidden && slot.char) {
+                // Show if it has strokes (Friend's drawing) OR is a hidden special char
+                const hasStrokes = slot.strokes && slot.strokes.length > 0;
+                const isSpecial = slot.hidden && slot.char;
+
+                if (hasStrokes || isSpecial) {
                     count++;
                     const item = document.createElement('div');
                     item.className = 'slot';
                     item.style.cursor = 'pointer';
                     item.style.backgroundColor = '#fff';
                     item.style.border = '1px solid #ccc';
+                    item.style.width = '60px'; // Slightly larger
+                    item.style.height = '60px';
+                    item.style.display = 'flex';
+                    item.style.alignItems = 'center';
+                    item.style.justifyContent = 'center';
+                    item.style.overflow = 'hidden';
                     item.title = "클릭해서 붙이기";
-                    item.onclick = () => addSticker(slot.char);
-                    item.innerText = slot.char;
+
+                    if (hasStrokes) {
+                        // Render Strokes
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 150; canvas.height = 150; // High res
+                        canvas.style.width = '100%'; canvas.style.height = '100%';
+                        const ctx = canvas.getContext('2d');
+
+                        // Draw strokes
+                        slot.strokes.forEach(stroke => {
+                            if (stroke.points.length < 1) return;
+                            ctx.lineCap = 'round';
+                            ctx.lineJoin = 'round';
+                            ctx.strokeStyle = stroke.color;
+                            ctx.lineWidth = stroke.width * 2; // Thicker for thumbnail
+                            ctx.beginPath();
+                            if (stroke.type === 'line') {
+                                ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+                                for (let i = 1; i < stroke.points.length; i++) ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+                                ctx.stroke();
+                            } else if (stroke.type === 'heart') {
+                                ctx.font = `${stroke.width * 4}px Arial`;
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+                                for (let i = 0; i < stroke.points.length; i += 3) ctx.fillText("♥", stroke.points[i].x, stroke.points[i].y);
+                            } else if (stroke.type === 'v-stitch' || stroke.type === 'star') {
+                                ctx.fillStyle = stroke.color;
+                                ctx.font = `${stroke.width * 4}px Arial`;
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+                                for (let i = 0; i < stroke.points.length; i += 3) ctx.fillText("★", stroke.points[i].x, stroke.points[i].y);
+                            }
+                        });
+
+                        item.appendChild(canvas);
+                        item.onclick = () => addSticker(canvas.toDataURL(), true);
+                    } else {
+                        // Text Fallback (e.g. System Special Char)
+                        item.innerText = slot.char;
+                        item.style.fontSize = "24px";
+                        item.style.fontWeight = "bold";
+                        item.onclick = () => addSticker(slot.char, false);
+                    }
+
                     list.appendChild(item);
                 }
             });
 
-            if (count > 0) {
-                section.style.display = 'block';
-            } else {
-                section.style.display = 'none';
-            }
+            section.style.display = (count > 0) ? 'block' : 'none';
         }
 
-        function addSticker(char) {
+        function addSticker(content, isImage) {
             const container = document.getElementById('card-overlays');
             const sticker = document.createElement('div');
-            sticker.innerText = char;
+
+            if (isImage) {
+                const img = document.createElement('img');
+                img.src = content;
+                img.style.width = "100px";
+                img.style.height = "100px";
+                img.style.pointerEvents = "none";
+                sticker.appendChild(img);
+            } else {
+                sticker.innerText = content;
+                sticker.style.fontSize = "40px";
+                sticker.style.fontWeight = "bold";
+                sticker.style.color = "#fff";
+                sticker.style.textShadow = "2px 2px 0 #000";
+            }
+
             sticker.style.cssText = `
                 position: absolute; 
                 left: 50%; top: 50%; 
                 transform: translate(-50%, -50%);
-                font-size: 40px; 
-                font-weight: bold; 
-                color: #fff; 
-                text-shadow: 2px 2px 0 #000;
                 cursor: grab;
                 user-select: none;
-                pointer-events: auto; /* Re-enable pointer events for sticker */
+                pointer-events: auto;
                 z-index: 1000;
+                display: flex; justify-content: center; align-items: center;
+                width: auto; height: auto;
             `;
 
             // Drag Logic
