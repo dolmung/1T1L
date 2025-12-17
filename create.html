@@ -571,126 +571,128 @@
                 <button class="secondary-btn" onclick="goHome()">홈</button>
             </div>
 
-            <div class="dashboard-grid">
-                <div class="panel">
-                    <div id="live-section">
-                        <h3>실시간 참여 현황 <span style="font-size:12px; font-weight:normal; color:#666;">(클릭하여 상세보기)</span>
-                        </h3>
-                        <div id="live-grid" class="grid-box"></div>
-                    </div>
+        </div>
 
-                    <div id="result-wrapper" style="display:none; margin-top:0;">
-                        <h3>완성된 카드</h3>
-                        <div style="font-size:12px; color:#666; margin-bottom:10px;">카드를 클릭하거나 버튼을 눌러 뒷면에 편지를 쓰세요
-                        </div>
-
-                        <!-- 3D Card Scene for Host -->
-                        <div class="scene" id="hostScene" style="pointer-events:auto;">
-                            <style>
-                                /* Disable hover tilt if any existed, ensure clean flip */
-                                #hostScene:hover .card:not(.is-flipped) {
-                                    transform: rotateX(0) rotateY(0);
-                                }
-
-                                .card-flip-btn {
-                                    position: absolute;
-                                    top: -45px;
-                                    right: 0;
-                                    width: auto;
-                                    padding: 8px 12px;
-                                    background: #fff;
-                                    border: 2px solid #000;
-                                    border-radius: 8px;
-                                    font-size: 13px;
-                                    font-weight: 700;
-                                    cursor: pointer;
-                                    z-index: 100;
-                                    box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
-                                    white-space: nowrap;
-                                }
-                            </style>
-                            <div class="card-flip-btn" id="hostFlipBtn" onclick="flipHostCard()">편지 쓰기</div>
-                            <div class="card" id="hostCard" onclick="flipHostCard()">
-                                <div class="card-face card-front" style="background:#A14343;">
-                                    <img id="final-img" style="width:100%; height:100%; object-fit:contain;" src=""
-                                        onload="adjustHostCardSize(this)">
-                                </div>
-                                <div class="card-face card-back" onclick="event.stopPropagation()">
-                                    <!-- Stop propagation to prevent accidental flip while typing -->
-                                    <h3 style="border:none;">To. Friends</h3>
-                                    <textarea id="HostLetter" placeholder="친구들에게 보낼 메시지를 여기에 적어주세요!"
-                                        style="width:100%; flex:1; padding:15px; background:#fafafa; border:1px solid #eee;"></textarea>
-                                    <button class="secondary-btn"
-                                        style="width:100%; margin-top:10px; background:#000; color:#fff; border:none; padding:12px; font-weight:bold; border-radius:8px; cursor:pointer;"
-                                        onclick="saveHostLetter()">편지 저장</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="margin-top:20px; text-align:center;">
-                            <button class="secondary-btn" onclick="downloadImg()">이미지(GIF) 다운로드</button>
-                        </div>
-                    </div>
+        <div class="dashboard-grid">
+            <div class="panel">
+                <div id="live-section">
+                    <h3>실시간 참여 현황 <span style="font-size:12px; font-weight:normal; color:#666;">(클릭하여 상세보기)</span>
+                    </h3>
+                    <div id="live-grid" class="grid-box"></div>
                 </div>
 
-                <div class="panel">
-                    <div style="margin-bottom:30px;">
-                        <h3>초대 링크</h3>
-                        <div id="share-link" class="link-box"></div>
-                        <button class="secondary-btn" style="width:100%" onclick="copyLink()">링크 복사</button>
-                        <div style="display:flex; gap:10px; margin-top:10px;">
-                            <button class="secondary-btn" style="flex:1; background:#FEE500; border:none; color:#000;"
-                                onclick="shareKakao()">카카오톡 공유</button>
-                        </div>
+                <div id="result-wrapper" style="display:none; margin-top:0;">
+                    <h3>완성된 카드</h3>
+                    <div style="font-size:12px; color:#666; margin-bottom:10px;">카드를 클릭하거나 버튼을 눌러 뒷면에 편지를 쓰세요
+                    </div>
 
+                    <!-- 3D Card Scene for Host -->
+                    <div class="scene" id="hostScene" style="pointer-events:auto;">
+                        <style>
+                            /* Disable hover tilt if any existed, ensure clean flip */
+                            #hostScene:hover .card:not(.is-flipped) {
+                                transform: rotateX(0) rotateY(0);
+                            }
 
-                        <div id="contributors-section" style="margin-top:40px; display:none;">
-                            <h3>친구들의 기록</h3>
-                            <div id="contributors-list"
-                                style="display:flex; flex-direction:column; gap:15px; max-height: 400px; overflow-y: auto;">
+                            .card-flip-btn {
+                                position: absolute;
+                                top: -45px;
+                                right: 0;
+                                width: auto;
+                                padding: 8px 12px;
+                                background: #fff;
+                                border: 2px solid #000;
+                                border-radius: 8px;
+                                font-size: 13px;
+                                font-weight: 700;
+                                cursor: pointer;
+                                z-index: 100;
+                                box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+                                white-space: nowrap;
+                            }
+                        </style>
+                        <div class="card-flip-btn" id="hostFlipBtn" onclick="flipHostCard()">편지 쓰기</div>
+                        <div class="card" id="hostCard" onclick="flipHostCard()">
+                            <div class="card-face card-front" style="background:#A14343;">
+                                <img id="final-img" style="width:100%; height:100%; object-fit:contain;" src=""
+                                    onload="adjustHostCardSize(this)">
+                            </div>
+                            <div class="card-face card-back" onclick="event.stopPropagation()">
+                                <!-- Stop propagation to prevent accidental flip while typing -->
+                                <h3 style="border:none;">To. Friends</h3>
+                                <textarea id="HostLetter" placeholder="친구들에게 보낼 메시지를 여기에 적어주세요!"
+                                    style="width:100%; flex:1; padding:15px; background:#fafafa; border:1px solid #eee;"></textarea>
+                                <button class="secondary-btn"
+                                    style="width:100%; margin-top:10px; background:#000; color:#fff; border:none; padding:12px; font-weight:bold; border-radius:8px; cursor:pointer;"
+                                    onclick="saveHostLetter()">편지 저장</button>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- DETAIL MODAL -->
-                <!-- DETAIL MODAL -->
-                <div id="detail-modal" class="modal-overlay" onclick="closeModal()">
-                    <!-- Flip Scene Container -->
-                    <div class="scene" style="width:300px; height:300px;" onclick="event.stopPropagation()">
-
-                        <div class="card-flip-btn" onclick="flipDetailCard()">뒤집기</div>
-
-                        <div class="card" id="detailCard" onclick="flipDetailCard()">
-                            <!-- Front: Drawing -->
-                            <div class="card-face card-front"
-                                style="background:#fff; border:1px solid #000; position:relative;">
-                                <div id="modal-char"
-                                    style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:150px; color:#eee; z-index:-1;">
-                                    ?</div>
-                                <canvas id="modal-canvas" width="300" height="300"
-                                    style="width:100%; height:100%; object-fit:contain;"></canvas>
-                            </div>
-
-                            <!-- Back: Message -->
-                            <div class="card-face card-back" style="background:#fff; border:1px solid #000;">
-                                <h3 id="modal-user-back" style="margin-top:0; border:none;">From. User</h3>
-                                <div id="modal-msg"
-                                    style="flex:1; display:flex; align-items:center; justify-content:center; padding:10px; font-size:16px; white-space:pre-wrap; overflow-y:auto; word-break:break-all;">
-                                    (Message)
-                                </div>
-                            </div>
-                        </div>
+                    <div style="margin-top:20px; text-align:center;">
+                        <button class="secondary-btn" onclick="downloadImg()">이미지(GIF) 다운로드</button>
                     </div>
-                </div>
-
-                <div id="card-management-section">
-                    <h3>카드 관리</h3>
-                    <p id="make-desc" style="font-size:12px; color:#666;">공개 시간이 되면 카드를 완성할 수 있어요</p>
-                    <button id="make-btn" class="create-btn" onclick="makeFinalCard()" disabled>공개 대기 중</button>
                 </div>
             </div>
+
+            <div class="panel">
+                <div style="margin-bottom:30px;">
+                    <h3>초대 링크</h3>
+                    <div id="share-link" class="link-box"></div>
+                    <button class="secondary-btn" style="width:100%" onclick="copyLink()">링크 복사</button>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <button class="secondary-btn" style="flex:1; background:#FEE500; border:none; color:#000;"
+                            onclick="shareKakao()">카카오톡 공유</button>
+                    </div>
+
+
+                    <div id="contributors-section" style="margin-top:40px; display:none;">
+                        <h3>친구들의 기록</h3>
+                        <div id="contributors-list"
+                            style="display:flex; flex-direction:column; gap:15px; max-height: 400px; overflow-y: auto;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DETAIL MODAL -->
+            <!-- DETAIL MODAL -->
+            <div id="detail-modal" class="modal-overlay" onclick="closeModal()">
+                <!-- Flip Scene Container -->
+                <div class="scene" style="width:300px; height:300px;" onclick="event.stopPropagation()">
+
+                    <div class="card-flip-btn" onclick="flipDetailCard()">뒤집기</div>
+
+                    <div class="card" id="detailCard" onclick="flipDetailCard()">
+                        <!-- Front: Drawing -->
+                        <div class="card-face card-front"
+                            style="background:#fff; border:1px solid #000; position:relative;">
+                            <div id="modal-char"
+                                style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:150px; color:#eee; z-index:-1;">
+                                ?</div>
+                            <canvas id="modal-canvas" width="300" height="300"
+                                style="width:100%; height:100%; object-fit:contain;"></canvas>
+                        </div>
+
+                        <!-- Back: Message -->
+                        <div class="card-face card-back" style="background:#fff; border:1px solid #000;">
+                            <h3 id="modal-user-back" style="margin-top:0; border:none;">From. User</h3>
+                            <div id="modal-msg"
+                                style="flex:1; display:flex; align-items:center; justify-content:center; padding:10px; font-size:16px; white-space:pre-wrap; overflow-y:auto; word-break:break-all;">
+                                (Message)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="card-management-section">
+                <h3>카드 관리</h3>
+                <p id="make-desc" style="font-size:12px; color:#666;">공개 시간이 되면 카드를 완성할 수 있어요</p>
+                <button id="make-btn" class="create-btn" onclick="makeFinalCard()" disabled>공개 대기 중</button>
+            </div>
         </div>
+    </div>
     </div>
 
     <script>
