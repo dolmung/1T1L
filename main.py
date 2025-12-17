@@ -462,21 +462,35 @@ def make_card_draw_strokes(draw, ox, oy, strokes, w, h):
                 r = scaled_width/2
                 draw.ellipse((x-r, y-r, x+r, y+r), fill=color)
         elif s_type == 'heart':
-             # Simplified copy of original logic...
-             f_size = int(scaled_width * 3)
+             f_size = int(scaled_width * 4)
              try: 
                  if os.path.exists("NanumGothic-Bold.ttf"):
                     font = ImageFont.truetype("NanumGothic-Bold.ttf", f_size)
                  else:
                     font = ImageFont.truetype("arial.ttf", f_size)
              except: font = ImageFont.load_default()
-             draw.text(render_points[0], "♥", font=font, fill=color)
-        elif s_type == 'v-stitch':
-             # Simplified
-             pass
+             
+             # Iterate points like client-side (stride 3 usually, or just all)
+             # Client uses stride 3.
+             for i in range(0, len(render_points), 3):
+                 # Center text
+                 draw.text(render_points[i], "♥", font=font, fill=color, anchor="mm")
+
+        elif s_type == 'v-stitch' or s_type == 'star':
+             f_size = int(scaled_width * 4)
+             try: 
+                 if os.path.exists("NanumGothic-Bold.ttf"):
+                    font = ImageFont.truetype("NanumGothic-Bold.ttf", f_size)
+                 else:
+                    font = ImageFont.truetype("arial.ttf", f_size)
+             except: font = ImageFont.load_default()
+             
+             for i in range(0, len(render_points), 3):
+                 draw.text(render_points[i], "★", font=font, fill=color, anchor="mm")
+                 
         elif s_type == 'text':
              char = stroke.get('char', '?')
-             draw.text(render_points[0], char, fill=color)
+             draw.text(render_points[0], char, fill=color, anchor="mm")
 
 @app.get("/api/config")
 def get_config():
