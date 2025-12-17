@@ -23,7 +23,7 @@ load_dotenv()
 app = FastAPI()
 
 # Ensure drawings directory exists (Local fallback)
-os.makedirs("static/drawings", exist_ok=True)
+# os.makedirs("static/drawings", exist_ok=True) # REMOVED: Causes 500 on Vercel (Read-only root)
 
 # --- Firebase Initialization ---
 # 1. Try to get credentials from ENV (Vercel / Local .env)
@@ -131,10 +131,11 @@ async def create_room(data: dict):
     
     room_id = str(random.randint(1000, 9999))
     
-    # Clean up stale GIF if exists (Local Only)
+    # Clean up stale GIF if exists (Local Only / Tmp)
     try:
-        if os.path.exists(f"result_{room_id}.gif"):
-            os.remove(f"result_{room_id}.gif")
+        gif_path = f"/tmp/result_{room_id}.gif" if os.getenv("VERCEL") else f"result_{room_id}.gif"
+        if os.path.exists(gif_path):
+            os.remove(gif_path)
     except: pass
 
     host_name = data.get('host_name', 'Host')
@@ -323,7 +324,9 @@ def get_result_card(room_id: str):
     # For MVP: We return local file IF it exists (generated in same instance), else error
     # Or simpler: Front-end triggers generation, back-end returns Base64 of GIF? (Might be heavy)
     
-    gif_path = f"result_{room_id}.gif"
+    # Generate path based on environment
+    gif_path = f"/tmp/result_{room_id}.gif" if os.getenv("VERCEL") else f"result_{room_id}.gif"
+    
     if os.path.exists(gif_path):
         return FileResponse(gif_path)
     return {"error": "Not generated yet or file lost (Serverless)"}
@@ -394,7 +397,7 @@ def generate_card(room_id: str):
             
         frames.append(img)
         
-    out_file = f"result_{room_id}.gif"
+    out_file = f"/tmp/result_{room_id}.gif" if os.getenv("VERCEL") else f"result_{room_id}.gif"
     frames[0].save(out_file, save_all=True, append_images=frames[1:], duration=120, loop=0, disposal=2)
     
     # Update Open Time to close room
