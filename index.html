@@ -138,31 +138,21 @@
             z-index: 2;
         }
 
+
         .card-flip-btn {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            /* Changed from circle icon to text button */
+            top: -40px;
+            right: 0;
             width: auto;
-            height: auto;
-            padding: 5px 12px;
+            padding: 8px 16px;
             background: #fff;
-            border: 1px solid #000;
+            border: 2px solid #000;
             border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-size: 14px;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
             z-index: 100;
-            transition: 0.2s;
-        }
-
-        .card-flip-btn:hover {
-            background: #000;
-            color: #fff;
-            /* Removed rotation since it's text now */
+            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
         }
 
         #host-message-display {
@@ -213,87 +203,137 @@
             margin-top: 30px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+        }
+
+        /* Tools Redesign */
+        .tools-container {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
             align-items: center;
             width: 100%;
-            max-width: 340px;
+            max-width: 360px;
         }
 
         .tool-row {
             display: flex;
-            justify-content: center;
-            gap: 15px;
+            justify-content: space-between;
+            align-items: center;
             width: 100%;
+            gap: 10px;
         }
 
-        .shape-btn,
-        .color-btn {
+        .tool-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .shape-btn {
             width: 44px;
             height: 44px;
-            border-radius: 22px;
+            border-radius: 8px;
+            /* Square with radius */
             border: 1px solid #ddd;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
             background: #fff;
-            transition: all 0.2s;
+            color: #333;
         }
 
-        .shape-btn.active,
-        .color-btn.active {
+        .shape-btn.active {
             border-color: #000;
-            transform: scale(1.1);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            color: #000;
+            background: #f0f0f0;
+        }
+
+        /* Specific visual fix for Dot */
+        .shape-btn .dot {
+            width: 8px;
+            height: 8px;
+            background: #000;
+            border-radius: 50%;
         }
 
         .eraser-btn {
             width: auto;
             padding: 0 15px;
-            border-radius: 22px;
             font-size: 14px;
             font-weight: bold;
-            white-space: nowrap;
-            /* Prevent line break */
         }
 
-        .trash-btn {
-            width: 44px;
-            height: 44px;
-            border: none;
-            background: transparent;
-            font-size: 20px;
-            color: #999;
-            cursor: pointer;
-        }
-
-        /* Back face inputs */
-        textarea {
-            flex: 1;
-            margin-top: 20px;
-            width: 100%;
-            border: 1px solid #eee;
-            background: #fafafa;
-            padding: 15px;
-            resize: none;
-            font-family: inherit;
-            outline: none;
-        }
-
-        /* OK Button next to colors */
-        .btn-send {
-            width: 60px;
-            height: 44px;
-            background: #000;
-            color: #fff;
-            border-radius: 22px;
+        .slider-container {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: 900;
+            gap: 8px;
+            flex: 1;
+            justify-content: flex-end;
+        }
+
+        input[type=range] {
+            width: 100px;
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+            outline: none;
+            padding: 0;
+            border: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #000;
             cursor: pointer;
-            margin-left: auto;
+            border-radius: 50%;
+        }
+
+        .color-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            /* default border */
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .color-btn.active {
+            transform: scale(1.1);
+            border: 2px solid #000;
+        }
+
+        .btn-clear-all {
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0 15px;
+            height: 44px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn-submit-large {
+            width: 150px;
+            height: 50px;
+            background: #A14343;
+            /* Match theme */
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -366,7 +406,8 @@
 
         <div class="scene">
             <!-- Flip Button attached to scene -->
-            <div class="card-flip-btn" onclick="flipCard()">뒤집기</div>
+            <!-- Flip Button attached to scene -->
+            <div class="card-flip-btn" onclick="flipCard()">뒷면에 편지쓰기</div>
 
             <div class="card" id="mainCard">
                 <div class="card-face card-front">
@@ -385,36 +426,39 @@
         </div>
 
         <!-- Tools moved outside card -->
+        <!-- Tools moved outside card -->
         <div class="tools-container">
+            <!-- Row 1: Brushes -->
             <div class="tool-row">
-                <!-- Shapes -->
-                <div class="shape-btn active" onclick="setBrushType('line', this)" title="선">
-                    <div style="width:6px; height:6px; background:#000; border-radius:50%;"></div>
+                <div class="tool-group">
+                    <div class="shape-btn active" onclick="setBrushType('line', this)" title="선">
+                        <div class="dot"></div>
+                    </div>
+                    <div class="shape-btn" onclick="setBrushType('heart', this)" title="하트">♥</div>
+                    <div class="shape-btn" onclick="setBrushType('v-stitch', this)" title="별">★</div>
+                    <div class="shape-btn eraser-btn" onclick="setEraser(this)">지우개</div>
                 </div>
-                <div class="shape-btn" onclick="setBrushType('heart', this)" title="하트">♥</div>
-                <div class="shape-btn" onclick="setBrushType('v-stitch', this)" title="스티치">∨</div>
-                <div class="shape-btn eraser-btn" onclick="setEraser(this)">지우개</div>
 
-                <!-- Thickness Slider -->
-                <div style="display:flex; align-items:center; gap:5px; flex:1; margin-left:10px;">
-                    <span style="font-size:10px; font-weight:bold;">두께</span>
+                <div class="slider-container">
                     <input type="range" id="thicknessSlider" min="1" max="30" value="5"
-                        style="width:100%; accent-color:#000;" oninput="setBrushSize(this.value)">
+                        oninput="setBrushSize(this.value)">
+                    <div style="width:12px; height:12px; background:#000; border-radius:50%;"></div>
                 </div>
-
-                <button class="trash-btn" onclick="clearAll()">🗑️</button>
             </div>
+
+            <!-- Row 2: Colors -->
             <div class="tool-row">
-                <div class="color-btn active" style="background:#A14343" onclick="setColor('#A14343', this)"></div>
-                <div class="color-btn" style="background:#2e7d32" onclick="setColor('#2e7d32', this)"></div>
-                <div class="color-btn" style="background:#fdd835" onclick="setColor('#fdd835', this)"></div>
-                <div class="color-btn" style="background:#000000" onclick="setColor('#000000', this)"></div>
-                <div class="color-btn" style="background:#ffffff; border:1px solid #ccc;"
-                    onclick="setColor('#ffffff', this)"></div>
-
-                <!-- Integrated OK Button -->
-                <div class="btn-send" onclick="submitCard()">전송</div>
+                <div class="tool-group">
+                    <div class="color-btn active" style="background:#A14343" onclick="setColor('#A14343', this)"></div>
+                    <div class="color-btn" style="background:#558B2F" onclick="setColor('#558B2F', this)"></div>
+                    <div class="color-btn" style="background:#FDD835" onclick="setColor('#FDD835', this)"></div>
+                    <div class="color-btn" style="background:#000000" onclick="setColor('#000000', this)"></div>
+                    <div class="color-btn" style="background:#546E7A" onclick="setColor('#546E7A', this)"></div>
+                </div>
+                <button class="btn-clear-all" onclick="clearAll()">전체 삭제</button>
             </div>
+
+            <button class="btn-submit-large" onclick="submitCard()">보내기</button>
         </div>
     </div>
 
@@ -547,9 +591,18 @@
             isFlipped = !isFlipped;
             const card = document.getElementById('mainCard');
             const guide = document.getElementById('guideText');
+            const btn = document.querySelector('.card-flip-btn'); // Get the button
+
             stopDrawing();
-            if (isFlipped) { card.classList.add('is-flipped'); guide.innerText = "메시지를 작성하세요"; }
-            else { card.classList.remove('is-flipped'); guide.innerText = "브러쉬로 꾸며주세요!"; }
+            if (isFlipped) {
+                card.classList.add('is-flipped');
+                guide.innerText = "메시지를 작성하세요";
+                btn.innerText = "앞면으로 (그림 그리기)";
+            } else {
+                card.classList.remove('is-flipped');
+                guide.innerText = "글자를 예쁘게 꾸며주세요!";
+                btn.innerText = "뒷면에 편지쓰기";
+            }
         }
 
         let isFlipping = false;
@@ -699,17 +752,15 @@
                     }
                 }
                 else if (stroke.type === 'v-stitch') {
-                    // Draw V
-                    ctx.lineWidth = stroke.width / 3;
-                    ctx.beginPath();
-                    for (let i = 0; i < renderPoints.length; i += 3) {
-                        let x = renderPoints[i].x, y = renderPoints[i].y;
-                        let s = stroke.width;
-                        ctx.moveTo(x - s / 2, y - s / 2);
-                        ctx.lineTo(x, y + s / 2);
-                        ctx.lineTo(x + s / 2, y - s / 2);
+                    // Star Brush (Renamed from V-stitch)
+                    ctx.font = `${stroke.width * 1.5}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const interval = 3;
+                    for (let i = 0; i < renderPoints.length; i += interval) {
+                        ctx.fillStyle = stroke.color; // Ensure color
+                        ctx.fillText("★", renderPoints[i].x, renderPoints[i].y);
                     }
-                    ctx.stroke();
                 }
             });
         }
