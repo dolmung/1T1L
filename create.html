@@ -577,9 +577,11 @@
         <div class="dashboard-grid">
             <div class="panel">
                 <div id="live-section">
-                    <h3>실시간 참여 현황 <span style="font-size:12px; font-weight:normal; color:#666;">(클릭하여 상세보기)</span>
+                    <h3>실시간 참여 현황 <span style="font-size:12px; font-weight:normal; color:#666;"></span>
                     </h3>
-                    <div id="live-grid" class="grid-box"></div>
+                    <div id="live-grid" class="grid-box"
+                        style="display:flex; flex-wrap:wrap; align-content:flex-start; justify-content:center; gap:2px;">
+                    </div>
 
 
                 </div>
@@ -592,7 +594,9 @@
                             <h4 style="margin:0 0 5px 0; font-size:14px;">✨ 보너스 스티커</h4>
                             <div style="font-size:12px; color:#666; margin-bottom:5px;">친구들이 남긴 특수문자를 클릭해서 카드에 붙여보세요!
                             </div>
-                            <div id="sticker-list" class="grid-box" style="padding:0; gap:5px;"></div>
+                            <div id="sticker-list" class="grid-box"
+                                style="padding:0; gap:5px; display:flex; flex-wrap:wrap; justify-content:flex-start;">
+                            </div>
                         </div>
                     </div>
 
@@ -600,12 +604,14 @@
                     </div>
 
                     <!-- 3D Card Scene for Host -->
-                    <div class="scene" id="hostScene" style="pointer-events:auto;">
+                    <div class="scene" id="hostScene" style="pointer-events:auto; overflow:visible;">
                         <style>
                             /* Disable hover tilt if any existed, ensure clean flip */
                             #hostScene:hover .card:not(.is-flipped) {
                                 transform: rotateX(0) rotateY(0);
                             }
+
+                            /* Fix vertical jump on flip by ensuring consistant height via adjustHostCardSize */
 
                             .card-flip-btn {
                                 position: absolute;
@@ -634,81 +640,90 @@
                                     style="position:absolute; top:0; left:0; width:100%; height:100%; overflow:hidden; pointer-events:none;">
                                 </div>
                             </div>
-                            <div class="card-face card-back" onclick="event.stopPropagation()">
+                            <!-- BACKFACE: Add overflow:auto for text content but hide card overflow to prevent size changes -->
+                            <div class="card-face card-back" onclick="event.stopPropagation()"
+                                style="overflow:hidden; display:flex; flex-direction:column;">
                                 <!-- Stop propagation to prevent accidental flip while typing -->
-                                <h3 style="border:none;">To. Friends</h3>
+                                <h3 style="border:none; margin-top:10px;">To. Friends</h3>
                                 <textarea id="HostLetter" placeholder="친구들에게 보낼 메시지를 여기에 적어주세요!"
-                                    style="width:100%; flex:1; padding:15px; background:#fafafa; border:1px solid #eee;"></textarea>
+                                    style="width:100%; flex:1; padding:15px; background:#fafafa; border:1px solid #eee; resize:none; overflow-y:auto;"></textarea>
                                 <button class="secondary-btn"
                                     style="width:100%; margin-top:10px; background:#000; color:#fff; border:none; padding:12px; font-weight:bold; border-radius:8px; cursor:pointer;"
                                     onclick="saveHostLetter()">편지 저장</button>
                             </div>
                         </div>
                     </div>
-
-                    <div style="margin-top:20px; text-align:center;">
-                        <button class="secondary-btn" onclick="downloadImg()">이미지(GIF) 다운로드</button>
-                    </div>
                 </div>
-            </div>
+            </div> <!-- End of Dashboard Panel -->
 
-            <div class="panel">
-                <div style="margin-bottom:30px;">
-                    <h3>초대 링크</h3>
-                    <div id="share-link" class="link-box"></div>
-                    <button class="secondary-btn" style="width:100%" onclick="copyLink()">링크 복사</button>
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <button class="secondary-btn" style="flex:1; background:#FEE500; border:none; color:#000;"
-                            onclick="shareKakao()">카카오톡 공유</button>
-                    </div>
+            <!-- SCRIPTS continue... -->
+            <script>
+                // We can overwrite filtered functions here if needed, but better to target specific lines below.
+            </script>
 
 
-                    <div id="contributors-section" style="margin-top:40px; display:none;">
-                        <h3>친구들의 기록</h3>
-                        <div id="contributors-list"
-                            style="display:flex; flex-direction:column; gap:15px; max-height: 400px; overflow-y: auto;">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- DETAIL MODAL -->
-            <!-- DETAIL MODAL -->
-            <div id="detail-modal" class="modal-overlay" onclick="closeModal()">
-                <!-- Flip Scene Container -->
-                <div class="scene" style="width:300px; height:300px;" onclick="event.stopPropagation()">
-
-                    <div class="card-flip-btn" onclick="flipDetailCard()">뒤집기</div>
-
-                    <div class="card" id="detailCard" onclick="flipDetailCard()">
-                        <!-- Front: Drawing -->
-                        <div class="card-face card-front"
-                            style="background:#fff; border:1px solid #000; position:relative;">
-                            <div id="modal-char"
-                                style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:150px; color:#eee; z-index:-1;">
-                                ?</div>
-                            <canvas id="modal-canvas" width="300" height="300"
-                                style="width:100%; height:100%; object-fit:contain;"></canvas>
-                        </div>
-
-                        <!-- Back: Message -->
-                        <div class="card-face card-back" style="background:#fff; border:1px solid #000;">
-                            <h3 id="modal-user-back" style="margin-top:0; border:none;">From. User</h3>
-                            <div id="modal-msg"
-                                style="flex:1; display:flex; align-items:center; justify-content:center; padding:10px; font-size:16px; white-space:pre-wrap; overflow-y:auto; word-break:break-all;">
-                                (Message)
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="card-management-section">
-                <h3>카드 관리</h3>
-                <p id="make-desc" style="font-size:12px; color:#666;">공개 시간이 되면 카드를 완성할 수 있어요</p>
-                <button id="make-btn" class="create-btn" onclick="makeFinalCard()" disabled>공개 대기 중</button>
+            <div style="margin-top:20px; text-align:center;">
+                <button class="secondary-btn" onclick="downloadImg()">이미지(GIF) 다운로드</button>
             </div>
         </div>
+    </div>
+
+    <div class="panel">
+        <div style="margin-bottom:30px;">
+            <h3>초대 링크</h3>
+            <div id="share-link" class="link-box"></div>
+            <button class="secondary-btn" style="width:100%" onclick="copyLink()">링크 복사</button>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="secondary-btn" style="flex:1; background:#FEE500; border:none; color:#000;"
+                    onclick="shareKakao()">카카오톡 공유</button>
+            </div>
+
+
+            <div id="contributors-section" style="margin-top:40px; display:none;">
+                <h3>친구들의 기록</h3>
+                <div id="contributors-list"
+                    style="display:flex; flex-direction:column; gap:15px; max-height: 400px; overflow-y: auto;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DETAIL MODAL -->
+    <!-- DETAIL MODAL -->
+    <div id="detail-modal" class="modal-overlay" onclick="closeModal()">
+        <!-- Flip Scene Container -->
+        <div class="scene" style="width:300px; height:300px;" onclick="event.stopPropagation()">
+
+            <div class="card-flip-btn" onclick="flipDetailCard()">뒤집기</div>
+
+            <div class="card" id="detailCard" onclick="flipDetailCard()">
+                <!-- Front: Drawing -->
+                <div class="card-face card-front" style="background:#fff; border:1px solid #000; position:relative;">
+                    <div id="modal-char"
+                        style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:150px; color:#eee; z-index:-1;">
+                        ?</div>
+                    <canvas id="modal-canvas" width="300" height="300"
+                        style="width:100%; height:100%; object-fit:contain;"></canvas>
+                </div>
+
+                <!-- Back: Message -->
+                <div class="card-face card-back" style="background:#fff; border:1px solid #000;">
+                    <h3 id="modal-user-back" style="margin-top:0; border:none;">From. User</h3>
+                    <div id="modal-msg"
+                        style="flex:1; display:flex; align-items:center; justify-content:center; padding:10px; font-size:16px; white-space:pre-wrap; overflow-y:auto; word-break:break-all;">
+                        (Message)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="card-management-section">
+        <h3>카드 관리</h3>
+        <p id="make-desc" style="font-size:12px; color:#666;">공개 시간이 되면 카드를 완성할 수 있어요</p>
+        <button id="make-btn" class="create-btn" onclick="makeFinalCard()" disabled>공개 대기 중</button>
+    </div>
+    </div>
     </div>
     </div>
 
@@ -963,10 +978,8 @@
         let lastSlotsJSON = "";
 
         function renderLiveGrid(slots, cols) {
-            // Robustly handle Array vs Dict
             const slotArray = Array.isArray(slots) ? slots : Object.values(slots);
-
-            // Filter hidden slots first
+            // Filter: Remove hidden slots
             const visibleSlots = slotArray.filter(s => !s.hidden);
 
             const currentJSON = JSON.stringify(visibleSlots);
@@ -976,63 +989,44 @@
             const box = document.getElementById('live-grid');
             box.innerHTML = '';
 
-            let rowDiv = document.createElement('div');
-            rowDiv.className = 'row';
+            // Flex Wrap Layout
+            box.style.display = 'flex';
+            box.style.flexWrap = 'wrap';
+            box.style.justifyContent = 'center';
+            box.style.alignContent = 'flex-start';
+            box.style.gap = '2px';
 
             visibleSlots.forEach((slot, idx) => {
-                // Hidden slots already filtered out above
-                // We need to access the correct slot data when clicking. 
-                // Using 'visibleSlots' array index is safe for valid closure reference within this loop.
-                const availableSlots = visibleSlots;
-
-
-                if (idx > 0 && idx % cols === 0) {
-                    box.appendChild(rowDiv);
-                    rowDiv = document.createElement('div');
-                    rowDiv.className = 'row';
-                }
-
                 const el = document.createElement('div');
                 el.className = 'slot';
-                // Inline styles removed. Controlled by CSS .slot
-
 
                 if (slot.char === ' ') {
                     el.classList.add('empty');
                 } else {
-                    if (slot.is_filled) {
-                        el.style.cursor = "pointer";
-                        el.onclick = () => openDetail(availableSlots[idx]);
-
-                        if (isOpened && slot.strokes) {
-                            // Render Canvas in slot
-                            el.style.backgroundColor = "#fff"; // White background for canvas
-                            el.style.border = "1px solid #ccc";
-                            el.innerHTML = ''; // Clear text
-
-                            const cvs = document.createElement('canvas');
-                            cvs.width = 100; // Render at higher internal res
-                            cvs.height = 100;
-                            cvs.style.width = '100%';
-                            cvs.style.height = '100%';
-
-                            const ctx = cvs.getContext('2d');
-                            renderStrokes(ctx, slot.strokes, 100, 100);
-                            el.appendChild(cvs);
-                        } else {
-                            // Normal "Participated" state (Brown block)
-                            el.style.backgroundColor = "#A14343";
-                            el.style.color = "#fff";
-                            el.innerText = slot.char;
-                        }
-                    } else {
-                        el.innerText = slot.char;
-                    }
+                    el.innerText = slot.char;
+                    el.classList.add('filled');
                 }
-                rowDiv.appendChild(el);
+
+                // Visual override (Images/Strokes)
+                if (slot.strokes && slot.strokes.length > 0) {
+                    el.innerHTML = '';
+                    const cvs = document.createElement('canvas');
+                    cvs.width = 50; cvs.height = 50;
+                    cvs.style.width = '100%'; cvs.style.height = '100%';
+                    const ctx = cvs.getContext('2d');
+                    renderStrokes(ctx, slot.strokes, 50, 50);
+                    el.appendChild(cvs);
+                } else if (slot.image_path) {
+                    el.innerHTML = `<img src="${slot.image_path}" style="width:100%; height:100%; object-fit:contain;">`;
+                }
+
+                // Add message tooltip
+                el.title = `From ${slot.reserved_by || 'Anonymous'}: ${slot.message || ''}`;
+
+                box.appendChild(el);
             });
-            box.appendChild(rowDiv);
         }
+
 
         async function makeFinalCard() {
             if (!myRoomId) return;
@@ -1219,19 +1213,19 @@
             list.innerHTML = '';
             let count = 0;
 
-            Object.values(slots).forEach(slot => {
-                // Show if it has strokes (Friend's drawing) OR is a hidden special char
-                const hasStrokes = slot.strokes && slot.strokes.length > 0;
-                const isSpecial = slot.hidden && slot.char;
+            const slotArray = Array.isArray(slots) ? slots : Object.values(slots);
 
-                if (hasStrokes || isSpecial) {
+            slotArray.forEach(slot => {
+                // User Request: ONLY SPECIAL CHARS (hidden)
+                // We ignore 'strokes' unless it is ALSO a hidden/special slot.
+                if (slot.hidden && slot.char) {
                     count++;
                     const item = document.createElement('div');
                     item.className = 'slot';
                     item.style.cursor = 'pointer';
                     item.style.backgroundColor = '#fff';
                     item.style.border = '1px solid #ccc';
-                    item.style.width = '60px'; // Slightly larger
+                    item.style.width = '60px';
                     item.style.height = '60px';
                     item.style.display = 'flex';
                     item.style.alignItems = 'center';
@@ -1239,20 +1233,19 @@
                     item.style.overflow = 'hidden';
                     item.title = "클릭해서 붙이기";
 
-                    if (hasStrokes) {
-                        // Render Strokes
+                    if (slot.strokes && slot.strokes.length > 0) {
                         const canvas = document.createElement('canvas');
-                        canvas.width = 150; canvas.height = 150; // High res
+                        canvas.width = 150; canvas.height = 150;
                         canvas.style.width = '100%'; canvas.style.height = '100%';
                         const ctx = canvas.getContext('2d');
 
-                        // Draw strokes
                         slot.strokes.forEach(stroke => {
                             if (stroke.points.length < 1) return;
                             ctx.lineCap = 'round';
                             ctx.lineJoin = 'round';
                             ctx.strokeStyle = stroke.color;
-                            ctx.lineWidth = stroke.width * 2; // Thicker for thumbnail
+                            ctx.lineWidth = stroke.width * 2;
+
                             ctx.beginPath();
                             if (stroke.type === 'line') {
                                 ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
@@ -1275,7 +1268,6 @@
                         item.appendChild(canvas);
                         item.onclick = () => addSticker(canvas.toDataURL(), true);
                     } else {
-                        // Text Fallback (e.g. System Special Char)
                         item.innerText = slot.char;
                         item.style.fontSize = "24px";
                         item.style.fontWeight = "bold";
