@@ -459,6 +459,7 @@
         }
     </style>
 </head>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
 
 <body>
@@ -579,10 +580,22 @@
                     <h3>실시간 참여 현황 <span style="font-size:12px; font-weight:normal; color:#666;">(클릭하여 상세보기)</span>
                     </h3>
                     <div id="live-grid" class="grid-box"></div>
+
+
                 </div>
 
                 <div id="result-wrapper" style="display:none; margin-top:0;">
                     <h3>완성된 카드</h3>
+                    <!-- Sticker Section (Moved here for better flow) -->
+                    <div id="sticker-section" style="margin-top:10px; margin-bottom:20px; display:none;">
+                        <div style="background:#fffbe6; padding:10px; border-radius:8px; border:1px solid #ffe58f;">
+                            <h4 style="margin:0 0 5px 0; font-size:14px;">✨ 보너스 스티커</h4>
+                            <div style="font-size:12px; color:#666; margin-bottom:5px;">친구들이 남긴 특수문자를 클릭해서 카드에 붙여보세요!
+                            </div>
+                            <div id="sticker-list" class="grid-box" style="padding:0; gap:5px;"></div>
+                        </div>
+                    </div>
+
                     <div style="font-size:12px; color:#666; margin-bottom:10px;">카드를 클릭하거나 버튼을 눌러 뒷면에 편지를 쓰세요
                     </div>
 
@@ -613,9 +626,13 @@
                         </style>
                         <div class="card-flip-btn" id="hostFlipBtn" onclick="flipHostCard()">편지 쓰기</div>
                         <div class="card" id="hostCard" onclick="flipHostCard()">
-                            <div class="card-face card-front" style="background:#A14343;">
+                            <div class="card-face card-front" style="background:#A14343; position:relative;">
                                 <img id="final-img" style="width:100%; height:100%; object-fit:contain;" src=""
                                     onload="adjustHostCardSize(this)">
+                                <!-- Sticker Overlay Container -->
+                                <div id="card-overlays"
+                                    style="position:absolute; top:0; left:0; width:100%; height:100%; overflow:hidden; pointer-events:none;">
+                                </div>
                             </div>
                             <div class="card-face card-back" onclick="event.stopPropagation()">
                                 <!-- Stop propagation to prevent accidental flip while typing -->
@@ -903,7 +920,9 @@
                 window.history.pushState({}, '', '/host?room=' + roomId);
 
                 checkTime();
+                checkTime();
                 renderLiveGrid(data.slots, data.columns);
+                renderStickers(data.slots); // Load Stickers
                 checkFinalCard();
                 populateContributors(data.slots);
 
@@ -965,6 +984,7 @@
             const data = await res.json();
             if (!data.error) {
                 renderLiveGrid(data.slots, data.columns);
+                renderStickers(data.slots); // Load Stickers
             }
         }
 
@@ -1186,14 +1206,124 @@
         }
 
         function downloadImg() {
-            const src = document.getElementById('final-img').src;
-            if (!src) return;
-            const a = document.createElement('a');
-            a.href = src;
-            // Try to detect extension
-            const ext = src.includes('.gif') ? '.gif' : '.jpg';
-            a.download = `Card_${myRoomId}${ext}`;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            // New Logic: Use html2canvas to capture card + stickers
+            const cardFront = document.querySelector('#hostCard .card-front');
+            if (!cardFront) return;
+
+            // Flip to front if needed (to ensure capture)
+            const card = document.getElementById('hostCard');
+            if (card.classList.contains('is-flipped')) {
+                flipHostCard();
+                setTimeout(downloadImg, 700); // Retry after flip
+                return;
+            }
+
+            // Hide Flip Button Temporarily for clean capture? 
+            // Actually button is outside .card-front, so it's fine.
+            // But we need to make sure overlays are visible.
+
+            html2canvas(cardFront, {
+                backgroundColor: null, // Transparent if png, but card has bg
+                scale: 2, // Retain quality
+                logging: false,
+                useCORS: true // Important for external images
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Card_${myRoomId || 'Final'}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            }).catch(err => {
+                console.error(err);
+                alert("이미지 저장 실패: " + err);
+            });
+        }
+
+        // --- Sticker Logic ---
+        function renderStickers(slots) {
+            const list = document.getElementById('sticker-list');
+            const section = document.getElementById('sticker-section');
+            if (!list || !section) return;
+
+            list.innerHTML = '';
+            let count = 0;
+
+            // Filter Hidden Slots (Special Chars) OR just special logic for specials?
+            // Logic: slots that are hidden=true usually (from main.py spec)
+            Object.values(slots).forEach(slot => {
+                if (slot.hidden && slot.char) {
+                    count++;
+                    const item = document.createElement('div');
+                    item.className = 'slot';
+                    item.style.cursor = 'pointer';
+                    item.style.backgroundColor = '#fff';
+                    item.style.border = '1px solid #ccc';
+                    item.title = "클릭해서 붙이기";
+                    item.onclick = () => addSticker(slot.char);
+                    item.innerText = slot.char;
+                    list.appendChild(item);
+                }
+            });
+
+            if (count > 0) {
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function addSticker(char) {
+            const container = document.getElementById('card-overlays');
+            const sticker = document.createElement('div');
+            sticker.innerText = char;
+            sticker.style.cssText = `
+                position: absolute; 
+                left: 50%; top: 50%; 
+                transform: translate(-50%, -50%);
+                font-size: 40px; 
+                font-weight: bold; 
+                color: #fff; 
+                text-shadow: 2px 2px 0 #000;
+                cursor: grab;
+                user-select: none;
+                pointer-events: auto; /* Re-enable pointer events for sticker */
+                z-index: 1000;
+            `;
+
+            // Drag Logic
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            sticker.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialLeft = sticker.offsetLeft;
+                initialTop = sticker.offsetTop;
+                sticker.style.cursor = 'grabbing';
+                e.preventDefault(); // Prevent text selection
+                e.stopPropagation(); // Stop flip
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                sticker.style.left = `${initialLeft + dx}px`;
+                sticker.style.top = `${initialTop + dy}px`;
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+                sticker.style.cursor = 'grab';
+            });
+
+            // Delete on right click
+            sticker.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                if (confirm("이 스티커를 삭제할까요?")) sticker.remove();
+            });
+
+            container.appendChild(sticker);
         }
 
         function goHome() {
