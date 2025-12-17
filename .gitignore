@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+venv/
+env/
+.vscode/
+debug_out.txt
+serviceAccountKey.json
+*.gif
+static/drawings/*.png
