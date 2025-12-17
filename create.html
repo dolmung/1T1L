@@ -543,7 +543,10 @@
     <div id="screen-dashboard" class="screen">
         <div class="dashboard-header">
             <div style="display:flex; flex-direction:column; gap:5px;">
-                <div style="font-weight:900; font-size:32px; line-height:1; letter-spacing:-1px;">ONE TYPE<br>ONE LETTER
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <div
+                        style="font-weight:900; font-size:60px; line-height:0.9; letter-spacing:-2px; text-transform:uppercase;">
+                        ONE TYPE<br>ONE LETTER</div>
                 </div>
                 <div style="font-size:12px; font-weight:bold; margin-bottom:10px;">ONLINE Rolling Paper</div>
                 <span class="dashboard-title">ROOM <span id="room-id-display"></span></span>
@@ -566,7 +569,13 @@
                     </div>
 
                     <!-- 3D Card Scene for Host -->
-                    <div class="scene" id="hostScene">
+                    <div class="scene" id="hostScene" style="pointer-events:auto;">
+                        <style>
+                            /* Disable hover tilt if any existed, ensure clean flip */
+                            #hostScene:hover .card:not(.is-flipped) {
+                                transform: rotateX(0) rotateY(0);
+                            }
+                        </style>
                         <div class="card-flip-btn" onclick="flipHostCard()">뒤집기</div>
                         <div class="card" id="hostCard" onclick="flipHostCard()">
                             <div class="card-face card-front" style="background:#A14343;">
