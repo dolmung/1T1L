@@ -545,6 +545,26 @@
                 const data = await res.json();
                 if (!data.error) {
                     document.getElementById('room-host-display').innerText = `${data.host_name}'s ROOM`;
+
+                    // Bypass Setup if Open
+                    if (data.is_open) {
+                        const img = document.querySelector('#final-card-img');
+                        img.src = `/result_card/${roomId}`;
+                        img.onerror = function () {
+                            this.style.display = 'none';
+                            // document.getElementById('no-image-msg').style.display = 'block'; 
+                        };
+
+                        // Update Host Name on back of card
+                        const hostNameEl = document.getElementById('final-host-back-name');
+                        if (hostNameEl) hostNameEl.innerText = `From. ${data.host_name || 'Host'}`;
+
+                        const hMsg = (data.host_message || "").trim();
+                        document.getElementById('host-message-display').innerText = hMsg || "호스트의 메시지가 없습니다.";
+
+                        // Hide setup, show final
+                        showScreen('final-screen');
+                    }
                 }
             } catch (e) { console.error(e); }
         }
