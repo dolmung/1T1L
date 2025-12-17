@@ -943,15 +943,16 @@
                 }
 
                 clearTimeout(animationFrameId);
-                renderCanvas(false);
-                const imageData = document.getElementById('drawingCanvas').toDataURL("image/png");
+                // renderCanvas(false); 
+                // Don't need image_data for server anymore, saving strokes only to reduce payload
+                // const imageData = document.getElementById('drawingCanvas').toDataURL("image/png");
                 drawLoop();
 
                 const res = await fetch(`/join/${roomId}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         user_name: myName, message: msg,
-                        image_data: imageData,
+                        image_data: "", // Reduced Payload
                         strokes: drawingStrokes
                     })
                 });
