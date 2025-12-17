@@ -144,18 +144,21 @@
 
         .card-flip-btn {
             position: absolute;
-            top: -40px;
+            top: -45px;
+            /* More space */
             right: 0;
             width: auto;
-            padding: 8px 16px;
+            padding: 8px 12px;
             background: #fff;
             border: 2px solid #000;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             z-index: 100;
             box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+            /* Prevent wrap */
         }
 
         #host-message-display {
@@ -264,9 +267,13 @@
 
         .eraser-btn {
             width: auto;
-            padding: 0 15px;
+            min-width: 60px;
+            /* Ensure enough width */
+            padding: 0 10px;
             font-size: 14px;
             font-weight: bold;
+            white-space: nowrap;
+            /* Prevent text wrap */
         }
 
         .slider-container {
@@ -421,7 +428,7 @@
         <div class="scene">
             <!-- Flip Button attached to scene -->
             <!-- Flip Button attached to scene -->
-            <div class="card-flip-btn" onclick="flipCard()">뒷면에 편지쓰기</div>
+            <div class="card-flip-btn" onclick="flipCard()">편지 쓰기</div>
 
             <div class="card" id="mainCard">
                 <div class="card-face card-front">
@@ -613,11 +620,11 @@
             if (isFlipped) {
                 card.classList.add('is-flipped');
                 guide.innerText = "메시지를 작성하세요";
-                btn.innerText = "앞면으로 (그림 그리기)";
+                btn.innerText = "그림 그리기"; // Shortened
             } else {
                 card.classList.remove('is-flipped');
                 guide.innerText = "글자를 예쁘게 꾸며주세요!";
-                btn.innerText = "뒷면에 편지쓰기";
+                btn.innerText = "편지 쓰기"; // Shortened
             }
         }
 
