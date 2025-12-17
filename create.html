@@ -731,24 +731,23 @@
             <div style="margin-top:20px; text-align:center;">
                 <button class="secondary-btn" onclick="downloadImg()">이미지(GIF) 다운로드</button>
             </div>
-        </div>
+
+            <div class="panel">
+                <div style="margin-bottom:30px;">
+                    <h3>초대 링크</h3>
+                    <div id="share-link" class="link-box"></div>
+                    <button class="secondary-btn" style="width:100%" onclick="copyLink()">링크 복사</button>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <button class="secondary-btn" style="flex:1; background:#FEE500; border:none; color:#000;"
+                            onclick="shareKakao()">카카오톡 공유</button>
+                    </div>
 
 
-        <div class="panel">
-            <div style="margin-bottom:30px;">
-                <h3>초대 링크</h3>
-                <div id="share-link" class="link-box"></div>
-                <button class="secondary-btn" style="width:100%" onclick="copyLink()">링크 복사</button>
-                <div style="display:flex; gap:10px; margin-top:10px;">
-                    <button class="secondary-btn" style="flex:1; background:#FEE500; border:none; color:#000;"
-                        onclick="shareKakao()">카카오톡 공유</button>
-                </div>
-
-
-                <div id="contributors-section" style="margin-top:40px; display:none;">
-                    <h3>친구들의 기록</h3>
-                    <div id="contributors-list"
-                        style="display:flex; flex-direction:column; gap:15px; max-height: 400px; overflow-y: auto;">
+                    <div id="contributors-section" style="margin-top:40px; display:none;">
+                        <h3>친구들의 기록</h3>
+                        <div id="contributors-list"
+                            style="display:flex; flex-direction:column; gap:15px; max-height: 400px; overflow-y: auto;">
+                        </div>
                     </div>
                 </div>
             </div>
