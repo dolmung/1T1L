@@ -419,7 +419,11 @@ def generate_card(room_id: str):
 
 # Include helper function make_card_draw_strokes (copied from original)
 def make_card_draw_strokes(draw, ox, oy, strokes, w, h):
-    scale = (w / 340.0) * 1.5 # Boost stroke thickness by 1.5x
+    # Scale coordinates to fit the slot (240px) from client canvas (340px)
+    coord_scale = w / 340.0
+    # Boost thickness relative to scale so lines aren't too thin
+    thickness_scale = coord_scale * 1.5 
+
     for stroke in strokes:
         color = stroke.get('color', '#000000')
         width = stroke.get('width', 5)
@@ -427,13 +431,17 @@ def make_card_draw_strokes(draw, ox, oy, strokes, w, h):
         s_type = stroke.get('type', 'line')
         
         if not points: continue
-        scaled_width = max(1, int(width * scale))
+        
+        # Apply thickness scale
+        scaled_width = max(1, int(width * thickness_scale))
+        
         render_points = []
         for p in points:
             jx = (random.random()-0.5)*5
             jy = (random.random()-0.5)*5
-            px = ox + (p['x'] * scale) + jx
-            py = oy + (p['y'] * scale) + jy
+            # Apply coordinate scale
+            px = ox + (p['x'] * coord_scale) + jx
+            py = oy + (p['y'] * coord_scale) + jy
             render_points.append((px, py))
             
         if s_type == 'line':

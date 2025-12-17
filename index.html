@@ -126,12 +126,15 @@
         .card-back {
             transform: rotateY(180deg);
             z-index: 1;
-            padding: 30px;
+            padding: 20px;
+            /* Reduced vertical padding */
             display: flex;
             flex-direction: column;
             text-align: center;
             background: #A14343;
             color: #fff;
+            justify-content: center;
+            /* Center content vertically */
         }
 
         .card-front {
@@ -340,6 +343,17 @@
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
 
 <body>
+    <!-- Brush Cursor -->
+    <div id="brushCursor" style="
+        position: fixed; 
+        pointer-events: none; 
+        border: 1px solid #000; 
+        border-radius: 50%; 
+        transform: translate(-50%, -50%); 
+        z-index: 9999; 
+        display: none;
+        box-shadow: 0 0 2px rgba(255,255,255,0.8);
+    "></div>
 
     <!-- 1. SETUP SCREEN -->
     <div id="setup-screen" class="screen">
@@ -417,9 +431,11 @@
                     </div>
                 </div>
                 <div class="card-face card-back">
-                    <h2 style="text-transform:uppercase;">To. <span id="to-host-name">Host</span></h2>
+                    <h2 style="text-transform:uppercase; margin-top:0; font-size:20px;">To. <span
+                            id="to-host-name">Host</span></h2>
                     <textarea id="letterMsg" placeholder="친구에게 보낼 한마디를 적어주세요..."></textarea>
-                    <div style="font-size:13px; color:#999; text-align:right;">From. <span id="display-name"></span>
+                    <div style="font-size:13px; color:rgba(255,255,255,0.8); text-align:right; margin-top:5px;">From.
+                        <span id="display-name"></span>
                     </div>
                 </div>
             </div>
@@ -440,9 +456,9 @@
                 </div>
 
                 <div class="slider-container">
-                    <input type="range" id="thicknessSlider" min="1" max="30" value="5"
+                    <input type="range" id="thicknessSlider" min="1" max="50" value="5"
                         oninput="setBrushSize(this.value)">
-                    <div style="width:12px; height:12px; background:#000; border-radius:50%;"></div>
+                    <div id="brushPreview" style="width:5px; height:5px; background:#000; border-radius:50%;"></div>
                 </div>
             </div>
 
@@ -683,6 +699,24 @@
             currentStroke = null;
         }
 
+        /* Cursor Logic */
+        const cursorEl = document.getElementById('brushCursor');
+        document.addEventListener('mousemove', (e) => {
+            cursorEl.style.left = e.clientX + 'px';
+            cursorEl.style.top = e.clientY + 'px';
+
+            // Only show if hovering canvas and not flipped
+            const target = document.elementFromPoint(e.clientX, e.clientY);
+            if (target === canvas && !isFlipped) {
+                cursorEl.style.display = 'block';
+                cursorEl.style.width = currentWidth + 'px';
+                cursorEl.style.height = currentWidth + 'px';
+                cursorEl.style.borderColor = (currentType === 'eraser') ? '#000' : currentColor;
+            } else {
+                cursorEl.style.display = 'none';
+            }
+        });
+
         function drawLoop() {
             renderCanvas(true);
             animationFrameId = setTimeout(() => requestAnimationFrame(drawLoop), 100);
@@ -778,12 +812,24 @@
         function setBrushSize(val) {
             currentWidth = parseInt(val, 10);
             currentBrushSize = currentWidth; // Sync legacy variable if needed
+
+            // Update preview
+            const p = document.getElementById('brushPreview');
+            if (p) {
+                p.style.width = currentWidth + 'px';
+                p.style.height = currentWidth + 'px';
+                p.style.backgroundColor = currentColor;
+            }
         }
 
         function setColor(color, btn) {
             currentColor = color;
             isEraserMode = false;
             updateToolUI(null, btn);
+
+            // Update preview color
+            const p = document.getElementById('brushPreview');
+            if (p) p.style.backgroundColor = color;
         }
 
         function setEraser(btn) {
