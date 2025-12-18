@@ -774,7 +774,9 @@
         }
 
         function renderCanvas(jitter = false) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Fill with White first (instead of clearRect)
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // Fabric dots REMOVED
             /*
@@ -792,11 +794,11 @@
             drawingStrokes.forEach(stroke => {
                 if (stroke.points.length < 1) return;
 
-                // Eraser Logic
+                // Eraser Logic: Paint WHITE instead of Transparent
                 if (stroke.color === BG_COLOR) {
-                    ctx.globalCompositeOperation = 'destination-out';
-                    ctx.strokeStyle = "rgba(0,0,0,1)"; // Color doesn't matter for dest-out, usually
-                    ctx.fillStyle = "rgba(0,0,0,1)";
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.strokeStyle = "#ffffff";
+                    ctx.fillStyle = "#ffffff";
                 } else {
                     ctx.globalCompositeOperation = 'source-over';
                     ctx.strokeStyle = stroke.color;

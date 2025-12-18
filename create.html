@@ -603,9 +603,8 @@
                     <div class="scene" id="hostScene" style="pointer-events:auto;">
                         <style>
                             /* Disable hover tilt if any existed, ensure clean flip */
-                            #hostScene:hover .card:not(.is-flipped) {
-                                transform: rotateX(0) rotateY(0);
-                            }
+                            /* Disable hover tilt if any existed, ensure clean flip */
+                            /* Removed hover transform rule to keep it static */
 
                             .card-flip-btn {
                                 position: absolute;
