@@ -121,11 +121,11 @@
             transform-style: preserve-3d;
             transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
             border: 1px solid #000;
-            transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+            transform: rotateY(0deg);
         }
 
         .card.is-flipped {
-            transform: rotateX(var(--rx, 0deg)) rotateY(calc(180deg + var(--ry, 0deg)));
+            transform: rotateY(180deg);
         }
 
         #finalCard {
@@ -339,9 +339,9 @@
         }
 
         .btn-clear-all {
-            background: #000;
-            color: #fff;
-            border: none;
+            background: #fff;
+            color: #000;
+            border: 1px solid #ddd;
             border-radius: 8px;
             padding: 0 15px;
             height: 44px;
@@ -977,47 +977,7 @@
             });
         }
         initKakao();
-        // 3D Tilt Effect for Final Card
-        document.addEventListener('mousemove', function (e) {
-            if (isFlipping) return;
 
-            const card = document.getElementById('finalCard');
-            if (!card || document.getElementById('final-screen').classList.contains('hidden')) return;
-
-            const scene = document.getElementById('finalScene');
-            if (!scene.contains(e.target) && e.target !== scene) {
-                card.style.setProperty('--rx', '0deg');
-                card.style.setProperty('--ry', '0deg');
-                return;
-            }
-
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-
-            const rotateX = ((y - centerY) / centerY) * -25; // Increased to 25deg
-            const rotateY = ((x - centerX) / centerX) * 25;
-
-            card.style.setProperty('--rx', `${rotateX}deg`);
-            card.style.setProperty('--ry', `${rotateY}deg`);
-
-            const bgX = 50 + ((x / rect.width) - 0.5) * 200;
-            const bgY = 50 + ((y / rect.height) - 0.5) * 200;
-
-            card.style.setProperty('--bg-x', `${bgX}%`);
-            card.style.setProperty('--bg-y', `${bgY}%`);
-        });
-
-        document.addEventListener('mouseout', function (e) {
-            const card = document.getElementById('finalCard');
-            if (card) {
-                card.style.setProperty('--rx', '0deg');
-                card.style.setProperty('--ry', '0deg');
-            }
-        });
 
         function showTimeOverModal(msg) {
             const div = document.createElement('div');

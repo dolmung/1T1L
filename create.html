@@ -300,11 +300,11 @@
             transform-style: preserve-3d;
             transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
             border: none;
-            transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+            transform: rotateY(0deg);
         }
 
         .card.is-flipped {
-            transform: rotateX(var(--rx, 0deg)) rotateY(calc(180deg + var(--ry, 0deg)));
+            transform: rotateY(180deg);
         }
 
         .card-face {
@@ -755,54 +755,8 @@
             setTimeout(() => isFlipping = false, 600);
         }
 
-        // 3D Tilt Effect
-        document.addEventListener('mousemove', function (e) {
-            if (isFlipping) return;
 
-            const card = document.getElementById('hostCard');
-            if (!card) return;
-            const scene = document.getElementById('hostScene');
-            if (!scene.contains(e.target) && e.target !== scene) {
-                card.style.setProperty('--rx', '0deg');
-                card.style.setProperty('--ry', '0deg');
-                return;
-            }
 
-            // Disable tilt on button hover
-            if (e.target.closest('.card-flip-btn')) {
-                card.style.setProperty('--rx', '0deg');
-                card.style.setProperty('--ry', '0deg');
-                return;
-            }
-
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-
-            const rotateX = ((y - centerY) / centerY) * -25; // Max 25deg
-            const rotateY = ((x - centerX) / centerX) * 25;
-
-            card.style.setProperty('--rx', `${rotateX}deg`);
-            card.style.setProperty('--ry', `${rotateY}deg`);
-
-            const bgX = 50 + ((x / rect.width) - 0.5) * 200; // Move gradient
-            const bgY = 50 + ((y / rect.height) - 0.5) * 200;
-
-            card.style.setProperty('--bg-x', `${bgX}%`);
-            card.style.setProperty('--bg-y', `${bgY}%`);
-        });
-
-        // Reset on leave
-        document.addEventListener('mouseout', function (e) {
-            const card = document.getElementById('hostCard');
-            if (card) {
-                card.style.setProperty('--rx', '0deg');
-                card.style.setProperty('--ry', '0deg');
-            }
-        });
 
         function adjustHostCardSize(img) {
             const scene = document.getElementById('hostScene');
