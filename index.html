@@ -774,9 +774,7 @@
         }
 
         function renderCanvas(jitter = false) {
-            // Fill with White first (instead of clearRect)
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Fabric dots REMOVED
             /*
